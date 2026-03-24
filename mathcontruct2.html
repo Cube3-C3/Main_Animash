@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Math Constructor v0.3</title>
+
+<style>
+:root {
+  --bg:#0f1115; --panel:#1a1d24; --text:#e6e6e6;
+  --muted:#8a8f98; --accent:#4fc3f7; --bad:#ff6b6b;
+}
+body {
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:Inter,system-ui,sans-serif;
+}
+#app { padding:16px; }
+.container {
+  border:1px solid #222; border-radius:8px;
+  margin-bottom:16px; overflow:hidden;
+  width:600px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.history {
+  background:#0c0e12; padding:8px;
+  font-family:monospace; font-size:14px;
+  border-bottom:1px solid #222;
+}
+.constructor {
+  padding:12px; display:flex; gap:5px; flex-wrap:wrap;
+  align-items:center;
+}
+.block {
+  padding:5px 10px; border-radius:10px;
+  background:var(--panel); cursor:pointer;
+}
+.block.pending {
+  border:2px dashed var(--muted); color:var(--muted);
+}
+.block.operator { color:var(--accent); }
+.block.bad { background:var(--bad); color:#000; }
+.apply {
+  margin-left:auto; padding:8px 14px;
+  background:var(--accent); color:#000;
+  border:none; border-radius:6px; cursor:pointer;
+}
+.menu {
+  position:absolute; background:#111;
+  border:1px solid #333; border-radius:6px;
+  padding:4px; z-index:10;
+}
+.menu div {
+  padding:6px 10px; cursor:pointer;
+}
+.menu div:hover { background:#222; }
+</style>
+</head>
+
+<body>
+<div id="app"></div>
+
+<script>
+/* ========= DATA ========= */
+
+const OP_PRIORITY = { "+":1,"-":1,"*":2,"/":2 };
+
+const OPS = ["+","-","*","/"];
+const CMP = ["="];
+
+let containers = [];
+let openMenu = null;
+
+/* ========= CORE ========= */
+
+function createContainer() {
+  containers.push({
+    id: crypto.randomUUID(),
+    history: [],
+    current: {
+      blocks: [
+        valBlock(), cmpBlock("="), valBlock()
+      ]
+    }
+  });
+  render();
+}
+
+/* ========= BLOCKS ========= */
+
+function valBlock() {
+  return { kind:"value", value:null, pending:true };
+}
+function opBlock() {
+  return { kind:"operator", value:null, pending:true };
+}
+function cmpBlock(v) {
+  return { kind:"comparison", value:v, pending:false };
+}
+
+/* ========= MENUS ========= */
+
+function showMenu(x,y,items,onSelect) {
+  closeMenu();
+  const m=document.createElement("div");
+  m.className="menu";
+  m.style.left=x+"px"; m.style.top=y+"px";
+  items.forEach(it=>{
+    const d=document.createElement("div");
+    d.textContent=it;
+    d.onclick=()=>{ closeMenu(); onSelect(it); };
+    m.appendChild(d);
+  });
+  document.body.appendChild(m);
+  openMenu=m;
+}
+function closeMenu() {
+  if(openMenu) openMenu.remove();
+  openMenu=null;
+}
+
+/* ========= INTERACTION ========= */
+
+function clickBlock(block,container,e) {
+  if(!block.pending) return;
+
+  if(block.kind==="value") {
+    showMenu(e.pageX,e.pageY,["x","1","2","3","12"],v=>{
+      block.value = isNaN(v)?v:Number(v);
+      block.pending=false;
+      addPair(container,block);
+      render();
+    });
+  }
+
+  if(block.kind==="operator") {
+    showMenu(e.pageX,e.pageY,OPS,v=>{
+      block.value=v;
+      block.pending=false;
+      render();
+    });
+  }
+}
+
+function addPair(container,afterBlock) {
+  const i = container.current.blocks.indexOf(afterBlock);
+  if(container.current.blocks[i+1]?.kind==="operator") return;
+  container.current.blocks.splice(i+1,0,opBlock(),valBlock());
+}
+
+/* ========= APPLY ========= */
+
+function apply(container) {
+  const blocks = container.current.blocks;
+  if(blocks.some(b=>b.pending)) return;
+
+  const ast = toAST(blocks);
+  if(container.history.length) {
+    const prev = container.history.at(-1);
+    if(!equivalent(prev.ast,ast)) {
+      blocks.forEach(b=>b.bad=true);
+      setTimeout(()=>{blocks.forEach(b=>b.bad=false);render();},600);
+      return;
+    }
+  } else {
+    // When no history, just add without check (already the case, but explicit)
+  
+  container.history.push({
+    text: blocks.map(b=>b.value).join(" "),
+    ast
+  });
+  render();
+  }
+}
+
+/* ========= AST ========= */
+
+function toAST(blocks) {
+  const i = blocks.findIndex(b=>b.kind==="comparison");
+  return {
+    left: parseExpr(blocks.slice(0,i)),
+    right: parseExpr(blocks.slice(i+1))
+  };
+}
+
+function parseExpr(blocks) {
+  const out=[], ops=[];
+  blocks.forEach(b=>{
+    if(b.kind==="value") out.push(node(b.value));
+    else {
+      while(ops.length &&
+OP_PRIORITY[ops.at(-1).op]>=OP_PRIORITY[b.value]) {
+        pop();
+      }
+      ops.push({op:b.value});
+    }
+  });
+  while(ops.length) pop();
+  return out[0];
+
+  function pop() {
+    const r=out.pop(), l=out.pop();
+    out.push({op:ops.pop().op,l,r});
+  }
+}
+
+function node(v){ return typeof v==="number"?{num:v}:{var:v}; }
+
+/* ========= CHECK ========= */
+
+function evalAST(n,x){
+  if(n.num!==undefined) return n.num;
+  if(n.var) return x;
+  return n.op==="+"?evalAST(n.l,x)+evalAST(n.r,x):
+         n.op==="-"?evalAST(n.l,x)-evalAST(n.r,x):
+         n.op==="*"?evalAST(n.l,x)*evalAST(n.r,x):
+                     evalAST(n.l,x)/evalAST(n.r,x);
+}
+
+function equivalent(a,b){
+  for(const x of [-2,-1,1,2,5]) {
+    if(evalAST(a.left,x)-evalAST(a.right,x)
+     !==evalAST(b.left,x)-evalAST(b.right,x)) return false;
+  }
+  return true;
+}
+
+/* ========= RENDER ========= */
+
+function render() {
+  closeMenu();
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  containers.forEach(c => {
+    const d = document.createElement("div");
+    d.className = "container";
+    d.dataset.id = c.id;
+
+    const h = document.createElement("div");
+    h.className = "history";
+    h.innerHTML = c.history.map(e => e.text).join("<br>");
+    d.appendChild(h);
+
+    const cons = document.createElement("div");
+    cons.className = "constructor";
+    c.current.blocks.forEach(b => {
+      const el = document.createElement("div");
+      el.className = "block " + b.kind +
+        (b.pending ? " pending" : "") + (b.bad ? " bad" : "");
+      el.textContent = b.value ?? "□";
+      el.onclick = e => { e.stopPropagation(); clickBlock(b, c, e); };
+      cons.appendChild(el);
+    });
+    const btn = document.createElement("button");
+    btn.className = "apply";
+    btn.textContent = "Применить";
+    btn.onclick = e => { e.stopPropagation(); apply(c); };
+    cons.appendChild(btn);
+
+    d.appendChild(cons);
+    app.appendChild(d);
+  });
+}
+
+/* ========= CREATE/DELETE CONTAINERS ========= */
+document.addEventListener('click', e => {
+      const leftValues = blocks.slice(0, cmpIndex).filter(b => b.kind === "value" && !b.pending);
+      const rightValues = blocks.slice(cmpIndex + 1).filter(b => b.kind === "value" && !b.pending);
+
+  if (!e.target.closest('.container') && !e.target.closest('.menu')) {
+	 closeMenu()
+     if (!leftValues.length === 0 && !rightValues.length === 0) {
+		createContainer();
+	 } else {
+		containers = containers.filter(c => c.id !== containers.id);
+        render();
+	 }
+   }
+	
+});
+createContainer();
+
+</script>
+</body>
+</html>
