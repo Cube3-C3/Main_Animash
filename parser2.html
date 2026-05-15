@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Structural Math Reducer</title>
+<style>
+:root{--bg:#0f1115;--panel:#1a1d24;--text:#e6e6e6;--muted:#8a8f98;--accent:#4fc3f7;--bad:#ff6b6b}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+#app{max-width:960px;margin:20px auto;padding:0 16px}
+.panel{background:var(--panel);border:1px solid #2a2f38;border-radius:10px;padding:14px;margin-bottom:12px}
+textarea{width:100%;min-height:80px;background:#0b0d12;color:var(--text);border:1px solid #333;border-radius:8px;padding:10px;font-family:ui-monospace,monospace}
+button{margin-top:10px;padding:8px 14px;background:var(--accent);color:#000;border:none;border-radius:6px;cursor:pointer;font-weight:600}
+pre{white-space:pre-wrap;word-break:break-word;background:#0b0d12;border-radius:8px;padding:10px;border:1px solid #333}
+small{color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="panel">
+    <h3>Ввод выражения</h3>
+    <textarea id="expr">sin(x1)+12,34(56)=-x%</textarea>
+    <button id="run">Построить сущности</button>
+    <small>Пайплайн: tokenize → normalize → reduceNumbers → reduceVariables → reduceConstants → reduceGroups → reduceFunctions → detectUnaryOperators → detectBinaryOperators → detectComparisons</small>
+  </div>
+  <div class="panel"><h3>Токены</h3><pre id="tokens"></pre></div>
+  <div class="panel"><h3>Финальные сущности</h3><pre id="entities"></pre></div>
+  <div class="panel"><h3>Progressive reduction</h3><pre id="stages"></pre></div>
+ 
+</div>
+
+<script>
+const CONSTANTS = { pi: "PI", e: "E", phi: "PHI", "∞": "INFINITY" };
+const BINARY_OPS = new Set(["+", "-", "*", "/", "^"]);
+const PREFIX_UNARY = new Set(["+", "-"]);
+const POSTFIX_UNARY = new Set(["!", "%", "‰"]);
+const COMPARISONS = new Set(["=", "!=", "<", ">", "<=", ">="]);
+
+function mkBase(entity, subtype, raw, start, end, extra = {}) {
+  return { entity, subtype, raw, start, end, ...extra };
+}
+
+function tokenize(input) {
+  const out = [];
+  let i = 0;
+  while (i < input.length) {
+    const ch = input[i];
+    if (/\s/.test(ch)) { out.push({ type: "WS", value: ch, start: i, end: i + 1 }); i++; continue; }
+    if (/[0-9]/.test(ch)) { out.push({ type: "PARTNUMB", value: ch, start: i, end: i + 1 }); i++; continue; }
+    if (/[A-Za-z]/.test(ch) || ch === "∞") {
+      let j = i + 1;
+      while (j < input.length && /[A-Za-z]/.test(input[j])) j++;
+      out.push({ type: "WORD", value: input.slice(i, j), start: i, end: j }); i = j; continue;
+    }
+    if (ch === "(") { out.push({ type: "LPAREN", value: ch, start: i, end: i + 1 }); i++; continue; }
+    if (ch === ")") { out.push({ type: "RPAREN", value: ch, start: i, end: i + 1 }); i++; continue; }
+    if (ch === "," || ch === ".") { out.push({ type: "BORDER", value: ch, start: i, end: i + 1 }); i++; continue; }
+    if (ch === "_" || ch === "₍") { out.push({ type: "INDEXER", value: ch, start: i, end: i + 1 }); i++; continue; }
+    const two = input.slice(i, i + 2);
+    if (["!=", "<=", ">="].includes(two)) { out.push({ type: "COMPARISON", value: two, start: i, end: i + 2 }); i += 2; continue; }
+    if (["=", "<", ">"].includes(ch)) { out.push({ type: "COMPARISON", value: ch, start: i, end: i + 1 }); i++; continue; }
+    if (["+", "-", "*", "/", "^", "!", "%", "‰"].includes(ch)) { out.push({ type: "OPERATOR", value: ch, start: i, end: i + 1 }); i++; continue; }
+    out.push({ type: "ERROR", value: ch, start: i, end: i + 1 }); i++;
+  }
+  return out;
+}
+
+function createMappingMassive(tokens){
+  const mapRawToCompact=[];
+  const compactToRaw=[];
+  let compactIndex=0;
+  for(let i=0;i<tokens.length;i++){
+    const t=tokens[i];
+    if(t.type==="WS"){
+      for(let p=t.start;p<t.end;p++) mapRawToCompact[p]=null;
+      continue;
+    }
+    for(let p=t.start;p<t.end;p++){ mapRawToCompact[p]=compactIndex + (p-t.start); compactToRaw[compactIndex + (p-t.start)]=p; }
+    compactIndex += (t.end-t.start);
+  }
+  return { mapRawToCompact, compactToRaw };
+}
+
+const normalize = items => items.filter(t => t.type !== "WS");
+
+function reduceNumbers(items) {
+  const out = [];
+  for (let i = 0; i < items.length; i++) {
+    const t = items[i];
+    if (t.type !== "PARTNUMB") { out.push(t); continue; }
+    const startI = i;
+    let raw = t.value, j = i + 1;
+    while (j < items.length && ["PARTNUMB", "BORDER", "LPAREN", "RPAREN"].includes(items[j].type)) {
+      raw += items[j].value; j++;
+    }
+    if (!/^\d+([,.]\d+)?(\(\d+\))?$/.test(raw)) { out.push(t); continue; }
+    const m = raw.match(/^(\d+)(?:([,.])(\d+))?(?:\((\d+)\))?$/);
+    out.push(mkBase("OPERAND", "NUMBER", raw, items[startI].start, items[j - 1].end, {
+      structure: { integer: m[1] || null, decimal: m[3] || null, period: m[4] || null }
+    }));
+    i = j - 1;
+  }
+  return out;
+}
+
+function reduceVariables(items) {
+  const out = [];
+  for (let i = 0; i < items.length; i++) {
+    const t = items[i];
+    if (t.type === "WORD") {
+      let name = t.value, index = null, end = t.end, raw = t.value;
+      const n = items[i + 1];
+      if (n && n.type === "PARTNUMB") { index = n.value; raw += n.value; end = n.end; i++; }
+      out.push(mkBase("OPERAND", "VARIABLE", raw, t.start, end, { name, index }));
+    } else out.push(t);
+  }
+  return out;
+}
+
+function reduceConstants(items) {
+  return items.map(t => (t.entity === "OPERAND" && t.subtype === "VARIABLE" && CONSTANTS[t.name])
+    ? mkBase("OPERAND", "CONSTANT", t.raw, t.start, t.end, { constant: CONSTANTS[t.name] })
+    : t);
+}
+
+function reduceGroups(items) {
+  const stack = [];
+  for (let i = 0; i < items.length; i++) {
+    const t = items[i];
+    if (t.type === "LPAREN") stack.push(i);
+    if (t.type === "RPAREN" && stack.length) {
+      const l = stack.pop();
+      const children = items.slice(l + 1, i);
+      const raw = items.slice(l, i + 1).map(x => x.raw ?? x.value).join("");
+      items.splice(l, i - l + 1, mkBase("OPERAND", "GROUP", raw, items[l].start, items[i].end, { children, interactive: true }));
+      i = l;
+    }
+  }
+  return items;
+}
+
+function reduceFunctions(items) {
+  const out = [];
+  for (let i = 0; i < items.length; i++) {
+    const fn = items[i], arg = items[i + 1];
+    if (fn.entity === "OPERAND" && (fn.subtype === "VARIABLE" || fn.subtype === "CONSTANT") && arg?.entity === "OPERAND" && arg.subtype === "GROUP") {
+      out.push({
+        entity: "UNARY_OPERATOR",
+        operator: fn.name?.toLowerCase() || fn.constant.toLowerCase(),
+        semantic: "FUNCTION",
+        position: "prefix",
+        operand: arg,
+        raw: fn.raw + arg.raw,
+        start: fn.start,
+        end: arg.end
+      });
+      i++;
+    } else out.push(fn);
+  }
+  return out;
+}
+
+function isOperand(x){ return x?.entity === "OPERAND"; }
+
+function detectUnaryOperators(items) {
+  return items.map((t, i) => {
+    if (t.type !== "OPERATOR") return t;
+    const prev = items[i - 1], next = items[i + 1];
+    if (PREFIX_UNARY.has(t.value) && (!prev || prev.type === "LPAREN" || prev.entity === "BINARY_OPERATOR" || prev.entity === "COMPARISON")) {
+      return { entity: "UNARY_OPERATOR", operator: t.value, position: "prefix", operand: next ?? null, raw: t.value, start: t.start, end: t.end };
+    }
+    if (POSTFIX_UNARY.has(t.value) && isOperand(prev)) {
+      return { entity: "UNARY_OPERATOR", operator: t.value, position: "postfix", operand: prev, raw: t.value, start: t.start, end: t.end };
+    }
+    return t;
+  });
+}
+
+function detectBinaryOperators(items) {
+  return items.map(t => (t.type === "OPERATOR" && BINARY_OPS.has(t.value))
+    ? { entity: "BINARY_OPERATOR", operator: t.value, raw: t.value, start: t.start, end: t.end }
+    : t);
+}
+
+function detectComparisons(items) {
+  return items.map(t => (t.type === "COMPARISON" && COMPARISONS.has(t.value))
+    ? { entity: "COMPARISON", operator: t.value, raw: t.value, start: t.start, end: t.end }
+    : t);
+}
+
+function progressiveReduce(items, reducers){
+  const stages=[];
+  let current=items;
+  for(const [name,fn] of reducers){
+    current=fn(current);
+    stages.push({stage:name, snapshot: structuredClone(current)});
+  }
+  return { result: current, stages };
+}
+
+function pipeline(expr) {
+  const tokens = tokenize(expr);
+  const mappingMassive = createMappingMassive(tokens);
+  const initial = normalize(tokens);
+  const { result: entities, stages } = progressiveReduce(initial, [
+    ["reduceNumbers", reduceNumbers],
+    ["reduceVariables", reduceVariables],
+    ["reduceConstants", reduceConstants],
+    ["reduceGroups", reduceGroups],
+    ["reduceFunctions", reduceFunctions],
+    ["detectUnaryOperators", detectUnaryOperators],
+    ["detectBinaryOperators", detectBinaryOperators],
+    ["detectComparisons", detectComparisons]
+  ]);
+  return { tokens, entities, stages, mappingMassive };
+}
+
+function run() {
+  const expr = document.getElementById("expr").value;
+  const { tokens, entities, stages, mappingMassive } = pipeline(expr);
+  document.getElementById("tokens").textContent = JSON.stringify(tokens, null, 2);
+  document.getElementById("entities").textContent = JSON.stringify(entities, null, 2);
+  document.getElementById("stages").textContent = JSON.stringify(stages, null, 2);
+  //document.getElementById("mapping").textContent = JSON.stringify(mappingMassive, null, 2);
+}
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>
