@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#10257b",
+                        "success": "#8EF0A9",
+                        "secondary-fixed": "#d9e2ff",
+                        "surface-container-highest": "#e3e1e9",
+                        "tertiary": "#512200",
+                        "secondary-container": "#79a1fe",
+                        "border-subtle": "#E2E8F0",
+                        "inverse-on-surface": "#f2f0f8",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e3e1e9",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#2e5bb3",
+                        "surface-container-low": "#f5f2fa",
+                        "primary-fixed": "#dee1ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#303036",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#b9c3ff",
+                        "on-surface": "#1b1b21",
+                        "on-primary-container": "#a0afff",
+                        "on-tertiary-fixed": "#321300",
+                        "surface-container-high": "#e9e7ef",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#b9c3ff",
+                        "surface-bright": "#fbf8ff",
+                        "on-secondary-fixed-variant": "#06429a",
+                        "surface-tint": "#4658ad",
+                        "surface-container": "#efedf5",
+                        "on-background": "#1b1b21",
+                        "text-main": "#0F1115",
+                        "secondary-fixed-dim": "#b0c6ff",
+                        "on-secondary-fixed": "#001945",
+                        "tertiary-fixed": "#ffdbc8",
+                        "on-surface-variant": "#454651",
+                        "on-secondary-container": "#003581",
+                        "surface": "#FFFFFF",
+                        "background": "#fbf8ff",
+                        "tertiary-fixed-dim": "#ffb68a",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "outline": "#757683",
+                        "on-primary-fixed-variant": "#2d3f93",
+                        "accent-vowel": "#95F2C3",
+                        "error": "#FF7D7D",
+                        "tertiary-container": "#733400",
+                        "on-tertiary-fixed-variant": "#743501",
+                        "on-primary-fixed": "#001258",
+                        "surface-dim": "#dbd9e1",
+                        "text-muted": "#64748B",
+                        "primary-container": "#2c3e92",
+                        "outline-variant": "#c5c5d3",
+                        "on-tertiary-container": "#f99e64"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "pill-padding-y": "0.5rem",
+                        "component-gap": "1rem",
+                        "section-gap": "4rem",
+                        "safe-area": "2rem",
+                        "gutter": "1.5rem",
+                        "pill-padding-x": "1.25rem"
+                    },
+                    "fontFamily": {
+                        "stats-label": ["Inter"],
+                        "body-base": ["Inter"],
+                        "ui-label": ["Inter"],
+                        "stats-value": ["Inter"],
+                        "word-display": ["Inter"],
+                        "nav-pill": ["Inter"],
+                        "word-display-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "stats-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-base": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "ui-label": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "stats-value": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+                        "word-display": ["72px", {"lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "800"}],
+                        "nav-pill": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "word-display-mobile": ["44px", {"lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        #ortho-wrapper {
+                        align-items: center;
+                }
+                #ortho-slot {
+                        display: inline-flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-width: 0;
+                }
+                #ortho-slot.ortho-empty::after {
+                        position: absolute;
+                }
+                .ortho-empty::after {
+                        content: '_';
+                        opacity: 0.5;
+                }
+                #ortho-slot {
+                        display: inline-flex;
+                        justify-content: center;
+                        align-items: center;
+                        position: relative;
+                        overflow: hidden;
+
+                        min-width: 0;
+
+                        transition:
+                                width 0.2s ease,
+                                margin 0.2s ease,
+                                opacity 0.2s ease;
+                }
+
+                .slot-collapsed {
+                        width: 0 !important;
+                        min-width: 0 !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                }
+                .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .vowel-button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .vowel-button:hover {
+            color: #10257b;
+            background-color: rgba(16, 37, 123, 0.05);
+            border-radius: 0.5rem;
+        }
+        .vowel-button.correct {
+            color: #10257b;
+            background-color: #8EF0A9;
+            border-radius: 0.5rem;
+            transform: scale(1.1);
+        }
+        .vowel-button.wrong {
+            background-color: #FF7D7D;
+            border-radius: 0.5rem;
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .mode-button.active {
+            background-color: #10257b;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .keyboard-key {
+            @apply flex items-center justify-center w-10 h-12 bg-surface-container-low dark:bg-inverse-surface border border-subtle dark:border-outline rounded-lg font-ui-label text-base hover:bg-surface-container-high dark:hover:bg-outline transition-colors active:scale-95 dark:text-surface;
+        }
+        .keyboard-key-wide {
+            @apply flex items-center justify-center w-64 h-12 bg-surface-container-low dark:bg-inverse-surface border border-subtle dark:border-outline rounded-lg font-ui-label text-base hover:bg-surface-container-high dark:hover:bg-outline transition-colors active:scale-95 dark:text-surface;
+        }
+        .keyboard-key-placeholder {
+            @apply flex items-center justify-center w-10 h-12 opacity-0 pointer-events-none;
+        }
+        .level-button.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        #hidden-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .ortho-gap-converge {
+            transition: gap 0.3s ease-in-out;
+        }
+        .ortho-gap-diverge {
+            transition: gap 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-surface dark:bg-text-main text-on-surface dark:text-surface min-h-screen flex flex-col font-body-base overflow-hidden">
+<input aria-hidden="true" autocomplete="off" id="hidden-input" type="text"/>
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky border-b border-subtle dark:border-outline bg-surface dark:bg-text-main flex items-center justify-between px-gutter py-4 z-40">
+<div class="flex items-center gap-4">
+<div class="relative">
+<button class="flex items-center gap-2 p-2 px-4 text-primary dark:text-inverse-primary hover:bg-surface-container dark:hover:bg-inverse-surface transition-colors rounded-full" id="menu-dropdown-button" onclick="document.getElementById('mode-dropdown').classList.toggle('hidden')" title="Выбор режима">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-ui-label" id="current-mode-label">Орфография</span>
+</button>
+<div class="absolute left-0 mt-2 w-48 bg-surface dark:bg-text-main border border-subtle dark:border-outline rounded-lg shadow-xl z-50 overflow-hidden hidden" id="mode-dropdown">
+<div class="py-1">
+<button class="w-full px-4 py-2 text-left text-sm bg-primary/10 text-primary dark:text-inverse-primary hover:bg-primary/20 dark:hover:bg-inverse-surface transition-colors font-ui-label" id="menu-orthography" onclick="switchAppMode('training'); switchMode('orthography')">Орфография</button>
+<button class="w-full px-4 py-2 text-left text-sm text-text-muted dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-colors font-ui-label" id="menu-stress" onclick="switchAppMode('training'); switchMode('stress')">Ударение</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation Pills -->
+<div>
+<nav class="flex items-center gap-2 bg-surface-container-low dark:bg-inverse-surface p-1 rounded-full" id="nav-pills-training">
+<button class="level-button flex items-center gap-2 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-nav-pill hover:bg-surface-container-high dark:hover:bg-outline text-text-muted dark:text-surface-variant" id="level-letter" onclick="switchLevel('letter')">Буква</button>
+<button class="level-button flex items-center gap-2 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-nav-pill active bg-primary text-on-primary shadow-sm" id="level-word" onclick="switchLevel('word')">Слово</button>
+<button class="level-button flex items-center gap-2 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-nav-pill hover:bg-surface-container-high dark:hover:bg-outline text-text-muted dark:text-surface-variant" id="level-sentence" onclick="switchLevel('sentence')">Предложение</button>
+<button class="level-button flex items-center gap-2 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-nav-pill hover:bg-surface-container-high dark:hover:bg-outline text-text-muted dark:text-surface-variant" id="level-text" onclick="switchLevel('text')">Текст</button>
+</nav>
+<nav class="flex items-center gap-2 bg-surface-container-low dark:bg-inverse-surface p-1 rounded-full hidden" id="nav-pills-profile">
+<button class="profile-nav-button flex items-center gap-2 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-nav-pill active bg-primary text-on-primary shadow-sm" id="profile-stats" onclick="switchProfileTab('stats')">Статистика</button>
+<button class="profile-nav-button flex items-center gap-2 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-nav-pill hover:bg-surface-container-high dark:hover:bg-outline text-text-muted dark:text-surface-variant" id="profile-management" onclick="switchProfileTab('management')">Управление</button>
+</nav>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:text-primary dark:hover:text-inverse-primary transition-colors text-text-muted dark:text-surface-variant" id="btn-random-levels" onclick="toggleRandomLevels()"><span class="material-symbols-outlined">restart_alt</span></button>
+<div class="relative">
+<button class="p-2 text-text-muted dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors" id="settings-dropdown-button" onclick="document.getElementById('settings-dropdown').classList.toggle('hidden')" title="Настройки">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="absolute right-0 mt-2 w-56 bg-surface dark:bg-text-main border border-subtle dark:border-outline rounded-lg shadow-xl z-50 overflow-hidden hidden" id="settings-dropdown">
+<div class="py-3 px-4 flex flex-col gap-4">
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-sm font-ui-label text-on-surface dark:text-surface">Темная тема</span>
+<input checked="true" class="form-checkbox h-4 w-4 text-primary rounded border-subtle dark:border-outline" id="theme-toggle" onchange="toggleTheme(this.checked)" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-sm font-ui-label text-on-surface dark:text-surface">Клавиатура на экране</span>
+<input class="form-checkbox h-4 w-4 text-primary rounded border-subtle dark:border-outline" id="keyboard-toggle" onchange="toggleKeyboardSetting(this.checked)" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+<button class="p-2 text-primary dark:text-inverse-primary hover:bg-surface-container dark:hover:bg-inverse-surface transition-colors rounded-full" onclick="switchAppMode('profile')"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col items-center relative px-section-gap overflow-hidden pt-[33vh]">
+<div class="w-full max-w-4xl flex flex-col items-center relative">
+<!-- Start State View -->
+<div class="flex flex-col items-center gap-6" id="start-state">
+<div class="w-20 h-20 rounded-full bg-primary-fixed-dim dark:bg-primary/20 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-4xl text-primary dark:text-inverse-primary">play_arrow</span>
+</div>
+<div class="text-center">
+<h2 class="text-2xl font-bold text-primary dark:text-inverse-primary mb-2" id="mode-title">Тренировка орфографии</h2>
+<p class="text-text-muted dark:text-surface-variant max-w-xs mx-auto">Закрепите правильное произношение слов в интерактивном режиме.</p>
+</div>
+<button class="px-10 py-4 bg-primary dark:bg-inverse-primary text-on-primary dark:text-primary rounded-full font-ui-label text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all" onclick="startSession()">Начать тренировку</button>
+</div>
+<!-- Training View -->
+<div class="w-full flex flex-col items-center hidden" id="training-state">
+<!-- Word Area positioned approx 1/3 from top -->
+<div class="relative mb-12 text-center w-full">
+<h1 class="font-word-display text-word-display text-primary dark:text-inverse-primary flex items-center justify-center gap-0 tracking-widest select-none whitespace-pre-wrap px-4" id="word-container"><div class="flex items-center justify-center gap-2 ortho-gap-converge w-full" id="ortho-wrapper">
+<span class="flex-shrink-0 text-right">инте</span>
+<span class="w-[1ch] text-center border-b-4 border-primary text-transparent transition-all duration-300 flex-shrink-0" id="ortho-slot"> </span>
+<span class="flex-shrink-0 text-left">лект</span>
+</div></h1>
+<p class="mt-8 font-ui-label text-ui-label text-text-muted dark:text-surface-variant h-6" id="instruction-text">введите пропущенную букву</p>
+</div>
+<!-- Keyboard/Input feedback -->
+<div class="flex flex-col items-center gap-2 max-w-3xl mx-auto mb-8 w-full" id="orthography-keyboard" style="display: flex;"></div>
+<!-- Feedback Area -->
+<div class="h-12 transition-opacity duration-300 flex items-center justify-center opacity-0" id="feedback-area">
+<span class="text-success font-ui-label flex items-center gap-2 bg-success/10 px-6 py-2 rounded-full border border-success/20" id="feedback-container">
+<span class="material-symbols-outlined" id="feedback-icon">check_circle</span>
+<span class="" id="feedback-text">верно!</span>
+</span>
+</div>
+</div>
+<!-- Profile View -->
+<div class="w-full flex flex-col items-center hidden -mt-[10vh]" id="profile-state">
+<h2 class="text-3xl font-bold text-primary dark:text-inverse-primary mb-8" id="profile-title">Статистика</h2>
+<div class="w-full max-w-3xl bg-surface-container-low dark:bg-inverse-surface rounded-2xl p-8 border border-subtle dark:border-outline text-center">
+<p class="text-text-muted dark:text-surface-variant font-ui-label" id="profile-content">Сводная статистика скоро появится здесь.</p>
+<pre class="mt-4 text-left text-sm text-text-muted dark:text-surface-variant overflow-auto max-h-64 bg-surface dark:bg-text-main p-4 rounded-lg" id="profile-stats-raw"></pre>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Stats Bar -->
+<footer class="fixed bottom-0 w-full z-50 border-t border-subtle dark:border-outline bg-surface dark:bg-text-main" id="bottom-footer">
+<div class="flex justify-between items-center h-20 px-safe-area max-w-6xl mx-auto">
+<div class="flex gap-8 items-center">
+<div class="flex flex-col items-center min-w-[70px]">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider">Решено</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-inverse-primary" id="stat-solved">0</span>
+</div>
+<div class="flex flex-col items-center min-w-[70px]">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider">Успех</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-inverse-primary" id="stat-success">0%</span>
+</div>
+</div>
+<div class="invisible" id="session-controls">
+<button class="px-6 py-2 border border-error text-error rounded-full font-ui-label text-sm hover:bg-error hover:text-white transition-all flex items-center gap-2" onclick="endSession()">
+<span class="material-symbols-outlined text-[18px]">stop_circle</span>
+                Завершить сессию
+            </button>
+</div>
+<div class="flex gap-8 items-center">
+<div class="flex flex-col items-center min-w-[70px]">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider">Серия</span>
+<div class="flex items-center gap-1">
+<span class="font-stats-value text-stats-value text-primary dark:text-inverse-primary" id="stat-streak">0</span>
+<span class="material-symbols-outlined text-[16px] text-on-tertiary-container dark:text-tertiary-fixed-dim" style='font-variation-settings: "FILL" 1;'>local_fire_department</span>
+</div>
+</div>
+<div class="flex flex-col items-center min-w-[70px]">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider">Время</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-inverse-primary" id="stat-time">00:00</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+    class StatsManager {
+        constructor() {
+            this.storageKey = 'statrus.json';
+            this.data = this.loadData();
+        }
+
+        loadData() {
+            const rawData = localStorage.getItem(this.storageKey);
+            return rawData ? JSON.parse(rawData) : {};
+        }
+
+        saveData() {
+            localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+        }
+
+        updateWordStat(discipline, section, wordInfo, result) {
+            if (!this.data[discipline]) this.data[discipline] = {};
+            if (!this.data[discipline][section]) this.data[discipline][section] = [];
+
+            const wordsArray = this.data[discipline][section];
+
+            let wordStat = wordsArray.find(w => 
+                w.raw === wordInfo.raw && 
+                w.type === wordInfo.type && 
+                w.resolutionLvl === wordInfo.resolutionLvl
+            );
+
+            if (!wordStat) {
+                wordStat = {
+                    raw: wordInfo.raw,
+                    type: wordInfo.type,
+                    resolutionLvl: wordInfo.resolutionLvl,
+                    solvedCount: 0,
+                    successCount: 0,
+                    successRate: 0,
+                    averageSolveTime: 0
+                };
+                wordsArray.push(wordStat);
+            }
+
+            const previousTotalTime = wordStat.averageSolveTime * wordStat.solvedCount;
+            
+            wordStat.solvedCount += 1;
+            if (result.isSuccess) {
+                wordStat.successCount += 1;
+            }
+
+            wordStat.successRate = Math.round((wordStat.successCount / wordStat.solvedCount) * 100);
+            const newAvgTime = (previousTotalTime + result.timeSec) / wordStat.solvedCount;
+            wordStat.averageSolveTime = Number(newAvgTime.toFixed(2));
+
+            this.saveData();
+        }
+
+        getAllStats() {
+            return this.data;
+        }
+    }
+
+    const statsApp = new StatsManager();
+
+    const DATA = [
+        { word: "ИНТЕЛЛЕКТ", index: 5, type: "orthography", resolutionLvl: "word" },
+        { word: "КАТАЛОГ", index: 5, type: "stress", resolutionLvl: "word" },
+        { word: "МОЛОКО", index: 1, type: "orthography", resolutionLvl: "word" },
+        { word: "ДОГОВОР", index: 5, type: "stress", resolutionLvl: "word" },
+        { word: "АГЕНТ", index: 2, type: "stress", resolutionLvl: "word" },
+        { word: "пребывать в городе", index: 2, type: "orthography", resolutionLvl: "sentence" },
+        { word: "по-русски", index: 2, type: "orthography", resolutionLvl: "text" },
+        { word: "преклонить колени", index: 2, type: "orthography", resolutionLvl: "text" },
+        { word: "несмотря на", index: 92, type: "orthography", resolutionLvl: "sentence" },
+        { word: "не смотря", index: 2, type: "orthography", resolutionLvl: "sentence" }
+    ];
+
+    let currentAppMode = 'training';
+    let currentMode = 'orthography';
+    let currentLevel = 'word';
+    let isSessionActive = false;
+    let currentTask = null;
+    let mistakesInWord = 0;
+    let solvedCount = 0;
+    let attemptsCount = 0;
+    let streakCount = 0;
+    let seconds = 0;
+    let timerInterval = null;
+    let randomLevels = false;
+    let showKeyboardSetting = false;
+    let wordStartTime = 0;
+
+    const stats = {
+        stress: { solved: 0, attempts: 0, streak: 0 },
+        orthography: { solved: 0, attempts: 0, streak: 0 }
+    };
+
+    const hiddenInput = document.getElementById('hidden-input');
+        function resolveGap(symbol) {
+                if (symbol === 'backspace') {return 'gap-0';
+                }
+                if (symbol === '-') {return 'gap-2';
+                }
+                if (symbol === ' ') {return 'gap-6';
+                }               
+                return 'gap-4';
+        }
+        function getStructureType(symbol) {
+                if (symbol === 'backspace') {return 'collapse';
+                }
+
+                if (symbol === '-') {return 'weak-break';
+                }
+
+                if (symbol === ' ') {return 'strong-break';
+                }
+                return 'merged';
+        }
+        function setGap(wrapper, gapClass) {
+                wrapper.className = wrapper.className.replace(/\bgap-\d+\b/g, '');
+                wrapper.classList.add(gapClass);
+        }
+        function setSlotEmpty(slot, isEmpty) {
+                if (isEmpty) {
+                        slot.classList.add('ortho-empty');
+                } else {
+                        slot.classList.remove('ortho-empty');
+                }
+        }
+        function setSlotCollapsed(slot, collapsed) {
+                if (collapsed) {
+                        slot.classList.add('slot-collapsed');
+                } else {
+                        slot.classList.remove('slot-collapsed');
+                }
+        }
+        function applyDefaultInterval(expected, wrapper, slot) {
+                wrapper.className = wrapper.className.replace(/\bgap-\d+\b/g, '');
+                slot.classList.remove('w-full', 'w-fit', 'w-auto');
+
+                const expectedType = getStructureType(expected);
+                wrapper.classList.add(resolveGap(expectedType, 'expected'));
+        }
+
+    hiddenInput.addEventListener('input', (e) => {
+        if (!isSessionActive || currentMode !== 'orthography' || !currentTask || currentAppMode !== 'training') return;
+        const char = e.target.value.slice(-1).toLowerCase();
+        if (char && char.match(/[а-яё\-\s]/i)) {
+            handleOrthography(char);
+        }
+        e.target.value = '';
+    });
+
+    hiddenInput.addEventListener('keydown', (e) => {
+        if (!isSessionActive || currentMode !== 'orthography' || !currentTask || currentAppMode !== 'training') return;
+        if (e.key === 'Backspace') {
+            handleOrthography('backspace');
+        } else if (e.key === ' ') {
+            handleOrthography(' ');
+            e.preventDefault();
+        }
+    });
+
+    document.addEventListener('click', () => {
+        if (isSessionActive && currentMode === 'orthography' && currentAppMode === 'training') {
+            hiddenInput.focus();
+        }
+    });
+
+    function toggleTheme(isDark) {
+        document.documentElement.classList.toggle('dark', isDark);
+        document.documentElement.classList.toggle('light', !isDark);
+    }
+
+    function toggleKeyboardSetting(show) {
+        showKeyboardSetting = show;
+        updateKeyboardVisibility();
+    }
+
+    function updateKeyboardVisibility() {
+        const kb = document.getElementById('orthography-keyboard');
+        if (currentMode === 'orthography' && showKeyboardSetting && currentAppMode === 'training') {
+            kb.style.display = 'flex';
+        } else {
+            kb.style.display = 'none';
+        }
+    }
+
+    function toggleRandomLevels() {
+        randomLevels = !randomLevels;
+        const btn = document.getElementById('btn-random-levels');
+        if (randomLevels) {
+            btn.classList.remove('text-text-muted', 'dark:text-surface-variant');
+            btn.classList.add('text-primary', 'dark:text-inverse-primary');
+        } else {
+            btn.classList.remove('text-primary', 'dark:text-inverse-primary');
+            btn.classList.add('text-text-muted', 'dark:text-surface-variant');
+        }
+        if (isSessionActive) {
+            next();
+        }
+    }
+
+    function getRandomWord() {
+        let available = DATA.filter(d => d.type === currentMode);
+        if (!randomLevels) {
+            available = available.filter(d => d.resolutionLvl === currentLevel);
+        }
+        if (available.length === 0) {
+            available = DATA.filter(d => d.type === currentMode);
+        }
+        return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function switchAppMode(mode) {
+        if (isSessionActive && mode === 'profile') {
+            endSession();
+        }
+        currentAppMode = mode;
+        const btnRandom = document.getElementById('btn-random-levels');
+        const footer = document.getElementById('bottom-footer');
+        
+        if (mode === 'profile') {
+            document.getElementById('current-mode-label').textContent = 'Профиль';
+            document.getElementById('nav-pills-training').classList.add('hidden');
+            document.getElementById('nav-pills-profile').classList.remove('hidden');
+            document.getElementById('start-state').classList.add('hidden');
+            document.getElementById('training-state').classList.add('hidden');
+            document.getElementById('profile-state').classList.remove('hidden');
+            btnRandom.classList.add('hidden');
+            footer.classList.add('hidden');
+            document.getElementById('profile-stats-raw').textContent = JSON.stringify(statsApp.getAllStats(), null, 2);
+        } else {
+            document.getElementById('current-mode-label').textContent = currentMode === 'orthography' ? 'Орфография' : 'Ударение';
+            document.getElementById('nav-pills-training').classList.remove('hidden');
+            document.getElementById('nav-pills-profile').classList.add('hidden');
+            document.getElementById('profile-state').classList.add('hidden');
+            btnRandom.classList.remove('hidden');
+            footer.classList.remove('hidden');
+            if (!isSessionActive) {
+                document.getElementById('start-state').classList.remove('hidden');
+                document.getElementById('training-state').classList.add('hidden');
+            }
+            updateKeyboardVisibility();
+        }
+    }
+
+    function switchProfileTab(tab) {
+        document.querySelectorAll('.profile-nav-button').forEach(btn => {
+            btn.classList.remove('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+            btn.classList.add('text-text-muted', 'dark:text-surface-variant');
+        });
+        const activeBtn = document.getElementById(`profile-${tab}`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+            activeBtn.classList.remove('text-text-muted', 'dark:text-surface-variant');
+        }
+        document.getElementById('profile-title').textContent = tab === 'stats' ? 'Статистика' : 'Управление';
+        document.getElementById('profile-content').textContent = tab === 'stats' ? 'Сводная статистика скоро появится здесь.' : 'Настройки профиля скоро появятся здесь.';
+        document.getElementById('profile-stats-raw').style.display = tab === 'stats' ? 'block' : 'none';
+        if(tab === 'stats') {
+             document.getElementById('profile-stats-raw').textContent = JSON.stringify(statsApp.getAllStats(), null, 2);
+        }
+    }
+
+
+    function switchMode(mode) {
+        if (isSessionActive) {
+            if (!confirm('Текущая сессия будет завершена. Продолжить?')) return;
+            endSession();
+        }
+        
+        currentMode = mode;
+        const orthBtn = document.getElementById('menu-orthography');
+        const stressBtn = document.getElementById('menu-stress');
+        
+        if (orthBtn) orthBtn.className = 'w-full px-4 py-2 text-left text-sm text-text-muted dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-colors font-ui-label';
+        if (stressBtn) stressBtn.className = 'w-full px-4 py-2 text-left text-sm text-text-muted dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-colors font-ui-label';
+        
+        const activeMenu = document.getElementById(`menu-${mode}`);
+        if (activeMenu) activeMenu.className = 'w-full px-4 py-2 text-left text-sm bg-primary/10 text-primary dark:text-inverse-primary hover:bg-primary/20 dark:hover:bg-inverse-surface transition-colors font-ui-label';
+        
+        if (currentAppMode === 'training') {
+            document.getElementById('current-mode-label').textContent = mode === 'orthography' ? 'Орфография' : 'Ударение';
+        }
+        document.getElementById('mode-dropdown').classList.add('hidden');
+
+        const textLvl = document.getElementById('level-text');
+        const sentenceLvl = document.getElementById('level-sentence');
+        
+        if (mode === 'stress') {
+            if (textLvl) textLvl.classList.add('disabled');
+            if (sentenceLvl) sentenceLvl.classList.add('disabled');
+            if (currentLevel === 'text' || currentLevel === 'sentence') switchLevel('word');
+        } else {
+            if (textLvl) textLvl.classList.remove('disabled');
+            if (sentenceLvl) sentenceLvl.classList.remove('disabled');
+        }
+
+        document.getElementById('mode-title').textContent = mode === 'orthography' ? 'Тренировка орфографии' : 'Тренировка ударений';
+        resetStatsDisplay();
+        updateKeyboardVisibility();
+    }
+    
+    function switchLevel(level, force = false) {
+        currentLevel = level;
+        document.querySelectorAll('.level-button').forEach(btn => {
+            btn.classList.remove('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+            if(!btn.classList.contains('disabled')) btn.classList.add('text-text-muted', 'dark:text-surface-variant');
+        });
+        
+        const activeBtn = document.getElementById(`level-${level}`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+            activeBtn.classList.remove('text-text-muted', 'dark:text-surface-variant');
+        }
+
+        if (isSessionActive && !force && !randomLevels) {
+            next();
+        }
+    }
+
+    function startSession() {
+        isSessionActive = true;
+        document.getElementById('start-state').classList.add('hidden');
+        document.getElementById('training-state').classList.remove('hidden');
+        document.getElementById('session-controls').classList.remove('invisible');
+        
+        seconds = 0;
+        mistakesInWord = 0;
+        updateTimeDisplay();
+        timerInterval = setInterval(() => {
+            seconds++;
+            updateTimeDisplay();
+        }, 1000);
+
+        next();
+    }
+
+    function endSession() {
+        isSessionActive = false;
+        clearInterval(timerInterval);
+        document.getElementById('start-state').classList.remove('hidden');
+        document.getElementById('training-state').classList.add('hidden');
+        document.getElementById('session-controls').classList.add('invisible');
+        document.getElementById('word-container').innerHTML = '';
+        document.getElementById('feedback-area').classList.add('opacity-0');
+        hiddenInput.blur();
+    }
+
+    function next() {
+        mistakesInWord = 0;
+        document.getElementById('feedback-area').classList.add('opacity-0');
+        currentTask = getRandomWord();
+        
+        if (currentTask.resolutionLvl) {
+            switchLevel(currentTask.resolutionLvl, true);
+        }
+        
+        renderTask(currentTask);
+        wordStartTime = performance.now();
+        if (currentMode === 'orthography') {
+            setTimeout(() => hiddenInput.focus(), 50);
+        }
+    }
+
+    function renderTask(item) {
+        const wordEl = document.getElementById('word-container');
+        const keyboard = document.getElementById('orthography-keyboard');
+        const instruction = document.getElementById('instruction-text');
+        
+        keyboard.innerHTML = "";
+        wordEl.innerHTML = "";
+        const displayText = item.word.toLowerCase();
+
+        if (item.type === "orthography") {
+            instruction.textContent = 'введите пропущенную букву';
+
+            let expectedInput = '';
+            let correctCharToRender = '';
+            let before = '';
+            let after = '';
+
+            const strIdx = String(item.index);
+                        if (strIdx.length >= 2) {
+                                
+                                const x = parseInt(strIdx[0], 10);
+                                const y = parseInt(strIdx.slice(1), 10);
+
+                                if (x === 9) {
+                                        before = displayText.slice(0, y);
+                                        after = displayText.slice(y);
+                                        
+                                        expectedInput = 'backspace';
+                                        correctCharToRender = '';
+                                } else {
+                                        before = displayText.slice(0, y);
+                                        after = displayText.slice(y + 1);
+                                        
+                                        expectedInput = displayText[x] ? displayText[x].toLowerCase() : '';
+                                        correctCharToRender = expectedInput;
+                                }
+                        } else {
+                        
+                                const idx = parseInt(strIdx, 10);
+                                before = displayText.slice(0, idx);
+                                after = displayText.slice(idx + 1);
+                                
+                                expectedInput = displayText[idx] ? displayText[idx].toLowerCase() : '';
+                                correctCharToRender = expectedInput;
+                        }
+
+            currentTask.expectedInput = expectedInput;
+            currentTask.correctCharToRender = correctCharToRender;
+
+            if (displayText.length > 20) {
+                wordEl.classList.add('text-4xl');
+                wordEl.classList.remove('text-word-display');
+            } else {
+                wordEl.classList.remove('text-4xl');
+                wordEl.classList.add('text-word-display');
+            }
+
+            const expectedType = getStructureType(expectedInput);
+            let initialGapClass = 'gap-4'; 
+            
+            if (expectedInput === '-') {
+                initialGapClass = 'gap-2'; 
+            } else if (expectedInput === 'backspace') {
+                initialGapClass = 'gap-4'; 
+            }
+
+            const slotWidthClass = 'w-[1ch]';
+
+            const markup = `<div id="ortho-wrapper" class="flex items-center justify-center ${initialGapClass} ortho-gap-converge w-full transition-all duration-300">
+                <span class="flex-shrink-0 text-right">${before}</span>
+                <span id="ortho-slot" class="${slotWidthClass} text-center border-b-4 border-primary dark:border-inverse-primary text-transparent transition-all duration-300 flex-shrink-0 h-[1em]"></span>
+                <span class="flex-shrink-0 text-left">${after}</span>
+            </div>`;
+            wordEl.innerHTML = markup;
+
+            currentTask.initialGapClass = initialGapClass;
+            const layout = [
+                ['-', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', 'backspace'],
+                ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'ё'],
+                ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю'],
+                ['space']
+            ];
+            
+            layout.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex justify-center gap-2 w-full';
+                row.forEach(key => {
+                    const b = document.createElement("button");
+                    if (key === null) {
+                        b.className = "keyboard-key-placeholder";
+                    } else if (key === 'space') {
+                        b.className = "keyboard-key-wide";
+                        b.innerText = "пробел";
+                        b.onclick = () => handleOrthography(' ');
+                    } else if (key === 'backspace') {
+                        b.className = "keyboard-key w-16";
+                        b.innerHTML = '<span class="material-symbols-outlined text-[20px]">backspace</span>';
+                        b.onclick = () => handleOrthography('backspace');
+                    } else {
+                        b.className = "keyboard-key";
+                        b.innerText = key;
+                        b.onclick = () => handleOrthography(key);
+                    }
+                    rowDiv.appendChild(b);
+                });
+                keyboard.appendChild(rowDiv);
+            });
+            updateKeyboardVisibility();
+        }
+
+        if (item.type === "stress") {
+            keyboard.style.display = 'none';
+            instruction.textContent = 'кликните по ударной гласной';
+            wordEl.classList.remove('text-4xl');
+            wordEl.classList.add('text-word-display');
+
+            displayText.split("").forEach((ch, i) => {
+                if (i === item.index) {
+                    const btn = document.createElement('button');
+                    btn.className = 'vowel-button px-1 cursor-pointer';
+                    btn.textContent = ch;
+                    btn.onclick = () => handleStress(true, btn);
+                    wordEl.appendChild(btn);
+                } else if ("аеёиоуыэюя".includes(ch)) {
+                    const btn = document.createElement('button');
+                    btn.className = 'vowel-button px-1 cursor-pointer';
+                    btn.textContent = ch;
+                    btn.onclick = () => handleStress(false, btn);
+                    wordEl.appendChild(btn);
+                } else {
+                    const span = document.createElement('span');
+                    span.textContent = ch;
+                    wordEl.appendChild(span);
+                }
+            });
+        }
+    }
+        function handleOrthography(ch) {
+                if (!currentTask || currentMode !== 'orthography' || currentAppMode !== 'training') return;
+
+                ch = ch.toLowerCase();
+                const expected = currentTask.expectedInput.toLowerCase();
+                const renderChar = currentTask.correctCharToRender.toLowerCase();
+
+                const slot = document.getElementById('ortho-slot');
+                const wrapper = document.getElementById('ortho-wrapper');
+
+                if (!slot || !wrapper) return;
+
+                attemptsCount++;
+
+                setGap(wrapper, resolveGap(ch));
+
+                if (ch === expected) {
+                        solvedCount++;
+                        const timeSec = (performance.now() - wordStartTime) / 1000;
+                        statsApp.updateWordStat('Русский', currentMode, { raw: currentTask.word, type: currentTask.type, resolutionLvl: currentTask.resolutionLvl }, { isSuccess: mistakesInWord === 0, timeSec: timeSec });
+                        streakCount = (mistakesInWord === 0) ? streakCount + 1 : 0;
+
+                        slot.classList.remove('border-b-4', 'text-transparent', 'text-error');
+                        slot.classList.add('text-primary', 'dark:text-inverse-primary');
+
+                        if (ch === 'backspace') {
+                                slot.textContent = '';
+                                setSlotCollapsed(slot, true);
+                                setGap(wrapper, 'gap-0');
+                        } else if (ch === '-') {
+                                slot.textContent = '-';
+                                setSlotCollapsed(slot, false);
+                                setGap(wrapper, 'gap-2');
+                        } else if (ch === ' ') {
+                                slot.textContent = '';
+                                setSlotCollapsed(slot, false);
+                                setGap(wrapper, 'gap-4');
+                        } else {
+                                slot.textContent = renderChar;
+                                setSlotEmpty(slot, false);
+                                setSlotCollapsed(slot, false);
+                                setGap(wrapper, 'gap-0'); 
+                        }
+
+                        showFeedback(true, "Верно!");
+                        updateScore();
+                        setTimeout(next, 700);
+                        return;
+                }
+
+                mistakesInWord++;
+                streakCount = 0;
+
+                slot.classList.remove('text-transparent');
+                slot.classList.add('text-error');
+
+                if (ch === 'backspace') {
+                        slot.textContent = '⌫';
+                        setSlotEmpty(slot, false);
+                } else if (ch === ' ') {
+                        slot.textContent = '';
+                        setSlotEmpty(slot, true);
+                } else {
+                        slot.textContent = ch;
+                        setSlotEmpty(slot, false);
+                }
+                setSlotCollapsed(slot, false);
+
+                showFeedback(false, "Ошибка!");
+                updateScore();
+
+                setTimeout(() => {
+                        slot.textContent = '';
+                        setSlotEmpty(slot, true);
+                        slot.classList.remove('text-error');
+                        
+                        setGap(wrapper, currentTask.initialGapClass);
+                        
+                        setSlotCollapsed(slot, false);
+                }, 500);
+        }
+    function handleStress(correct, element) {
+        if (element.classList.contains('correct') || element.classList.contains('wrong') || currentAppMode !== 'training') return;
+        attemptsCount++;
+        if (correct) {
+            solvedCount++;
+            const timeSec = (performance.now() - wordStartTime) / 1000;
+            statsApp.updateWordStat('Русский', currentMode, { raw: currentTask.word, type: currentTask.type, resolutionLvl: currentTask.resolutionLvl }, { isSuccess: mistakesInWord === 0, timeSec: timeSec });
+            
+            if (mistakesInWord === 0) streakCount++; else streakCount = 0;
+            element.classList.add('correct');
+            showFeedback(true, "ударение верно!");
+            updateScore();
+            setTimeout(next, 700);
+        } else {
+            mistakesInWord++;
+            streakCount = 0;
+            element.classList.add('wrong');
+            showFeedback(false, "ошибка!");
+            updateScore();
+            setTimeout(() => element.classList.remove('wrong'), 400);
+        }
+    }
+
+    function showFeedback(isSuccess, text) {
+        const area = document.getElementById('feedback-area');
+        const container = document.getElementById('feedback-container');
+        const icon = document.getElementById('feedback-icon');
+        const textEl = document.getElementById('feedback-text');
+        if (!textEl) return;
+        textEl.textContent = text;
+        if (isSuccess) {
+            container.className = "text-success font-ui-label flex items-center gap-2 bg-success/10 px-6 py-2 rounded-full border border-success/20";
+            icon.textContent = "check_circle";
+        } else {
+            container.className = "text-error font-ui-label flex items-center gap-2 bg-error/10 px-6 py-2 rounded-full border border-error/20";
+            icon.textContent = "error";
+        }
+        area.classList.remove('opacity-0');
+    }
+
+    function updateScore() {
+        stats[currentMode].solved = solvedCount;
+        stats[currentMode].attempts = attemptsCount;
+        stats[currentMode].streak = streakCount;
+        updateStatsDisplay();
+    }
+
+    function updateStatsDisplay() {
+        document.getElementById('stat-solved').textContent = solvedCount;
+        document.getElementById('stat-streak').textContent = streakCount;
+        const successRate = attemptsCount === 0 ? 0 : Math.round((solvedCount / attemptsCount) * 100);
+        document.getElementById('stat-success').textContent = `${successRate}%`;
+    }
+
+    function resetStatsDisplay() {
+        solvedCount = stats[currentMode].solved || 0;
+        attemptsCount = stats[currentMode].attempts || 0;
+        streakCount = stats[currentMode].streak || 0;
+        updateStatsDisplay();
+    }
+
+    function updateTimeDisplay() {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        document.getElementById('stat-time').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    document.addEventListener('click', function(event) {
+        const modeDropdown = document.getElementById('mode-dropdown');
+        const modeButton = document.getElementById('menu-dropdown-button');
+        if (modeButton && !modeButton.contains(event.target) && modeDropdown && !modeDropdown.contains(event.target)) {
+            modeDropdown.classList.add('hidden');
+        }
+
+        const settingsDropdown = document.getElementById('settings-dropdown');
+        const settingsButton = document.getElementById('settings-dropdown-button');
+        if (settingsButton && settingsDropdown && !settingsButton.contains(event.target) && !settingsDropdown.contains(event.target)) {
+            settingsDropdown.classList.add('hidden');
+        }
+    });
+
+    // Init
+    isSessionActive = false;
+    solvedCount = 0;
+    attemptsCount = 0;
+    streakCount = 0;
+    seconds = 0;
+    
+    switchMode('orthography');
+    updateStatsDisplay();
+    updateTimeDisplay();
+ </script>
+</body></html>
