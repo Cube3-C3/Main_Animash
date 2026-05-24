@@ -400,15 +400,15 @@
     const statsApp = new StatsManager();
 
     const DATA = [
-        { word: "интеллект", slots: [3, 6], type: "orthography", Lvl: "word" },
-        { word: "превосходный", slots: [2, 4], type: "orthography", Lvl: "word" },
-        { word: "несмотря на", slots: [1, 7, 10], type: "orthography", Lvl: "sentence" },
+        { word: "интеллект", index: [3, 6], type: "orthography", Lvl: "word" },
+        { word: "превосходный", index: [2, 4], type: "orthography", Lvl: "word" },
+        { word: "несмотря на", index: [92, 7, 10], type: "orthography", Lvl: "sentence" },
         { word: "КАТАЛОГ", index: 5, type: "stress", Lvl: "word" },
-        { word: "молоко", slots: [1, 3], type: "orthography", Lvl: "word" },
+        { word: "молоко", index: [1, 3], type: "orthography", Lvl: "word" },
         { word: "ДОГОВОР", index: 5, type: "stress", Lvl: "word" },
         { word: "АГЕНТ", index: 2, type: "stress", Lvl: "word" },
-        { word: "пребывать в городе", slots: [6, 17], type: "orthography", Lvl: "sentence" },
-        { word: "по-русски", slots: [1, 5], type: "orthography", Lvl: "text" }
+        { word: "пребывать в городе", index: [6, 17], type: "orthography", Lvl: "sentence" },
+        { word: "по-русски", index: [1, 5], type: "orthography", Lvl: "text" }
     ];
 
     let currentAppMode = 'training';
@@ -544,8 +544,16 @@
         if (!randomLevels) {
             available = available.filter(d => d.Lvl === currentLevel);
         }
+
+        if (currentMode === 'orthography') {
+            available = available.filter(d => normalizeSlots(d).length > 0);
+        }
+
         if (available.length === 0) {
             available = DATA.filter(d => d.type === currentMode);
+            if (currentMode === 'orthography') {
+                available = available.filter(d => normalizeSlots(d).length > 0);
+            }
         }
         return available[Math.floor(Math.random() * available.length)];
     }
@@ -685,12 +693,81 @@
         hiddenInput.blur();
     }
 
+    function buildWeakSlotsFromWord(word) {
+        const weak = [];
+        const text = word.toLowerCase();
+        for (let i = 0; i < text.length; i++) {
+            if (text[i] === '-' || text[i] === ' ') {
+                weak.push({ index: i, expectedChar: text[i], renderChar: text[i], replaceMode: 'replace' });
+            }
+        }
+        return weak;
+    }
+
+    function normalizeSlots(wordData) {
+		const raw = wordData.index;
+		
+		// 1. Если слотов вообще нет, генерируем слабые места автоматически
+		if (raw === undefined || raw === null) {
+			return buildWeakSlotsFromWord(wordData.word);
+		}
+
+		// 2. Приводим к массиву: если было просто число `3`, станет `[3]`
+		const rawList = Array.isArray(raw) ? raw : [raw];
+		if (rawList.length === 0) return buildWeakSlotsFromWord(wordData.word);
+
+		const displayText = wordData.word.toLowerCase();
+		const normalized = [];
+
+		// 3. Парсим каждый элемент массива по единым правилам
+		rawList.forEach(item => {
+			const strIdx = String(item);
+			if (!strIdx) return;
+
+			// Логика для искусственного пропуска (формат 9y, например 92)
+			if (strIdx.length >= 2 && strIdx[0] === '9') {
+				const y = parseInt(strIdx.slice(1), 10);
+				if (Number.isInteger(y) && y >= 0 && y <= displayText.length) {
+					normalized.push({
+						index: y,
+						expectedChar: 'backspace',
+						renderChar: '',
+						replaceMode: 'insert'
+					});
+				}
+				return;
+			}
+
+			// Логика для обычного индекса буквы
+			const idx = parseInt(strIdx, 10);
+			if (Number.isInteger(idx) && idx >= 0 && idx < displayText.length) {
+				const char = displayText[idx];
+				normalized.push({
+					index: idx,
+					expectedChar: char,
+					renderChar: char,
+					replaceMode: 'replace'
+				});
+			}
+		});
+
+		return normalized.length > 0 ? normalized : buildWeakSlotsFromWord(wordData.word);
+	}
     function parseOrthographyTemplate(wordData) {
         const uiElements = [];
-        
-        for (let i = 0; i < wordData.word.length; i++) {
-            if (wordData.slots && wordData.slots.includes(i)) {
-                uiElements.push({ type: 'input', expectedChar: wordData.word[i], slotId: `gap-${i}` });
+        const normalizedSlots = normalizeSlots(wordData);
+        const slotMap = new Map(normalizedSlots.map(s => [s.index, s]));
+
+        for (let i = 0; i <= wordData.word.length; i++) {
+            const slotData = slotMap.get(i);
+            if (slotData && slotData.replaceMode === 'insert') {
+                uiElements.push({ type: 'input', expectedChar: slotData.expectedChar, renderChar: slotData.renderChar, slotId: `gap-${i}` });
+            }
+
+            if (i === wordData.word.length) break;
+
+            if (slotData && slotData.replaceMode !== 'insert') {
+                uiElements.push({ type: 'input', expectedChar: slotData.expectedChar, renderChar: slotData.renderChar, slotId: `gap-${i}` });
             } else {
                 if (uiElements.length > 0 && uiElements[uiElements.length - 1].type === 'text') {
                     uiElements[uiElements.length - 1].content += wordData.word[i];
@@ -776,7 +853,7 @@
                 const slot = document.createElement('span');
                 slot.id = `slot-${el.slotId}`;
                 slot.dataset.expected = el.expectedChar;
-                slot.className = 'w-[1ch] text-center border-b-4 border-primary dark:border-inverse-primary text-transparent transition-all duration-300 flex-shrink-0 h-[1em] ortho-slot';
+                slot.className = 'w-[1ch] text-center border-b-4 border-primary dark:border-inverse-primary text-transparent transition-all duration-300 flex-shrink-0 h-[1em] ortho-slot ortho-empty';
                 
                 if (slotIndex !== item.activeSlotIndex) {
                     slot.classList.add('opacity-50');
@@ -923,10 +1000,10 @@
 		slot.classList.remove('text-transparent');
 		slot.classList.add('text-error');
 
-		// Упругое расширение интервала от удара по неправильной клавише
-		let errorMargin = 'mx-5';
-		if (ch === ' ') errorMargin = 'mx-7';
-		setMargin(slotWrapper, errorMargin);
+		// На ошибке тоже используем целевой интервал введенного символа,
+		// чтобы анимация "сужения/подтягивания" вела себя так же, как на успехе.
+		// Иначе (при фиксированных больших mx-*) визуально всегда получается расширение.
+		setMargin(slotWrapper, resolveMargin(ch));
 
 		if (ch === 'backspace') {
 			slot.textContent = '⌫';
