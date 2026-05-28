@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#10257b",
+                        "success": "#8EF0A9",
+                        "secondary-fixed": "#d9e2ff",
+                        "surface-container-highest": "#e3e1e9",
+                        "tertiary": "#512200",
+                        "secondary-container": "#79a1fe",
+                        "border-subtle": "#E2E8F0",
+                        "inverse-on-surface": "#f2f0f8",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e3e1e9",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#2e5bb3",
+                        "surface-container-low": "#f5f2fa",
+                        "primary-fixed": "#dee1ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#303036",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#b9c3ff",
+                        "on-surface": "#1b1b21",
+                        "on-primary-container": "#a0afff",
+                        "on-tertiary-fixed": "#321300",
+                        "surface-container-high": "#e9e7ef",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#b9c3ff",
+                        "surface-bright": "#fbf8ff",
+                        "on-secondary-fixed-variant": "#06429a",
+                        "surface-tint": "#4658ad",
+                        "surface-container": "#efedf5",
+                        "on-background": "#1b1b21",
+                        "text-main": "#0F1115",
+                        "secondary-fixed-dim": "#b0c6ff",
+                        "on-secondary-fixed": "#001945",
+                        "tertiary-fixed": "#ffdbc8",
+                        "on-surface-variant": "#454651",
+                        "on-secondary-container": "#003581",
+                        "surface": "#FFFFFF",
+                        "background": "#fbf8ff",
+                        "tertiary-fixed-dim": "#ffb68a",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "outline": "#757683",
+                        "on-primary-fixed-variant": "#2d3f93",
+                        "accent-vowel": "#95F2C3",
+                        "error": "#FF7D7D",
+                        "tertiary-container": "#733400",
+                        "on-tertiary-fixed-variant": "#743501",
+                        "on-primary-fixed": "#001258",
+                        "surface-dim": "#dbd9e1",
+                        "text-muted": "#64748B",
+                        "primary-container": "#2c3e92",
+                        "outline-variant": "#c5c5d3",
+                        "on-tertiary-container": "#f99e64"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "pill-padding-y": "0.5rem",
+                        "component-gap": "1rem",
+                        "section-gap": "4rem",
+                        "safe-area": "2rem",
+                        "gutter": "1.5rem",
+                        "pill-padding-x": "1.25rem"
+                    },
+                    "fontFamily": {
+                        "stats-label": ["Inter"],
+                        "body-base": ["Inter"],
+                        "ui-label": ["Inter"],
+                        "stats-value": ["Inter"],
+                        "word-display": ["Inter"],
+                        "nav-pill": ["Inter"],
+                        "word-display-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "stats-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-base": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "ui-label": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "stats-value": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+                        "word-display": ["72px", {"lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "800"}],
+                        "nav-pill": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "word-display-mobile": ["44px", {"lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            margin: 0 auto;
+            position: relative;
+        }
+        #ortho-wrapper {
+                        align-items: center;
+                }
+                #ortho-slot {
+                        display: inline-flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-width: 0;
+                }
+                #ortho-slot.ortho-empty::after {
+                        position: absolute;
+                }
+                .ortho-empty::after {
+                        content: '_';
+                        opacity: 0.5;
+                }
+                #ortho-slot {
+                        display: inline-flex;
+                        justify-content: center;
+                        align-items: center;
+                        position: relative;
+                        overflow: hidden;
+
+                        min-width: 0;
+
+                        transition:
+                                width 0.2s ease,
+                                margin 0.2s ease,
+                                opacity 0.2s ease;
+                }
+
+                .slot-collapsed {
+                        width: 0 !important;
+                        min-width: 0 !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                }
+                .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .vowel-button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .vowel-button:hover {
+            color: #10257b;
+            background-color: rgba(16, 37, 123, 0.05);
+            border-radius: 0.25rem;
+        }
+        .vowel-button.correct {
+            color: #10257b;
+            background-color: #8EF0A9;
+            border-radius: 0.25rem;
+            transform: scale(1.1);
+        }
+        .vowel-button.wrong {
+            background-color: #FF7D7D;
+            border-radius: 0.25rem;
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .mode-button.active {
+            background-color: #10257b;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .keyboard-key {
+            @apply flex items-center justify-center bg-primary text-on-primary rounded-full font-nav-pill transition-all active:scale-95 h-[75px] shadow-sm;
+            min-width: 27px;
+            flex: 1;
+            margin: 0 2px;
+            font-size: 16px;
+        }
+        .keyboard-key-wide {
+            @apply flex items-center justify-center h-[75px] bg-primary text-on-primary rounded-full font-nav-pill transition-all active:scale-95 w-full shadow-sm;
+            font-size: 16px;
+        }
+        .keyboard-key-placeholder {
+            @apply flex items-center justify-center opacity-0 pointer-events-none;
+            min-width: 27px;
+            flex: 1;
+            margin: 0 2px;
+        }
+        .keyboard-row {
+            @apply flex justify-center w-full px-1;
+            gap: 10px;
+        }
+        .level-button.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        #hidden-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .ortho-gap-converge {
+            transition: gap 0.3s ease-in-out;
+        }
+        .ortho-gap-diverge {
+            transition: gap 0.3s ease-in-out;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head><body class="bg-surface dark:bg-inverse-surface text-on-surface dark:text-inverse-on-surface min-h-screen flex flex-col font-body-base overflow-x-hidden">
+<input aria-hidden="true" autocomplete="off" id="hidden-input" type="text"/>
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky border-b border-subtle bg-surface dark:bg-inverse-surface z-40">
+<div class="w-full px-4 px-gutter">
+<div class="flex items-center justify-between py-3 gap-2 sm:gap-4">
+<!-- Mode Selector -->
+<div class="flex items-center">
+<div class="relative">
+<button class="flex items-center gap-1 p-1 px-2 text-primary dark:text-primary-fixed hover:bg-surface-container transition-colors rounded-full min-w-0" id="menu-dropdown-button" onclick="document.getElementById('mode-dropdown').classList.toggle('hidden')" title="Выбор режима">
+<span class="material-symbols-outlined text-[20px]">menu</span>
+<span class="font-ui-label text-xs" id="current-mode-label">Орфография</span>
+</button>
+<div class="absolute left-0 mt-2 w-48 bg-surface dark:bg-inverse-surface border border-subtle rounded-lg shadow-xl z-50 overflow-hidden hidden" id="mode-dropdown">
+<div class="py-1">
+<button class="w-full px-4 py-2 text-left text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-ui-label" id="menu-orthography" onclick="switchMode('orthography')">Орфография</button>
+<button class="w-full px-4 py-2 text-left text-sm text-text-muted hover:bg-surface-container-low transition-colors font-ui-label" id="menu-stress" onclick="switchMode('stress')">Ударение</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation Pills (Centered in Header) -->
+<nav class="hidden md:flex items-center gap-1 bg-surface-container-low dark:bg-surface-container-highest p-1 rounded-full overflow-hidden">
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high text-text-muted whitespace-nowrap" id="level-letter" onclick="switchLevel('letter')">Буква</button>
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] active bg-primary text-on-primary shadow-sm whitespace-nowrap" id="level-word" onclick="switchLevel('word')">Слово</button>
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high text-text-muted whitespace-nowrap" id="level-sentence" onclick="switchLevel('sentence')">Фраза</button>
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high text-text-muted whitespace-nowrap" id="level-text" onclick="switchLevel('text')">Текст</button>
+</nav>
+<!-- Right Side Actions -->
+<div class="flex items-center gap-1">
+<button class="p-1 hover:text-primary transition-colors text-primary dark:text-primary-fixed" id="btn-random-levels" onclick="toggleRandomLevels()"><span class="material-symbols-outlined text-[20px]">restart_alt</span></button><div class="relative inline-block">
+<button class="p-1 text-text-muted hover:text-error transition-colors hidden" id="btn-reset-stats" onclick="document.getElementById('reset-dropdown').classList.toggle('hidden')" title="Сброс статистики">
+<span class="material-symbols-outlined text-[20px]">delete_forever</span>
+</button>
+<div class="absolute right-0 mt-2 w-56 bg-surface dark:bg-inverse-surface border border-subtle rounded-lg shadow-xl z-50 overflow-hidden hidden" id="reset-dropdown">
+<div class="py-1">
+<button class="w-full px-4 py-2 text-left text-sm text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-low transition-colors font-ui-label" onclick="resetStats('partial')">Очистить прогресс</button>
+<button class="w-full px-4 py-2 text-left text-sm text-error hover:bg-error/10 transition-colors font-ui-label" onclick="resetStats('full')">Удалить все</button>
+</div>
+</div>
+</div>
+<div class="relative">
+<button class="p-1 text-text-muted hover:text-primary transition-colors" id="settings-dropdown-button" onclick="document.getElementById('settings-dropdown').classList.toggle('hidden')" title="Настройки">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="absolute right-0 mt-2 w-48 bg-surface dark:bg-inverse-surface border border-subtle rounded-lg shadow-xl z-50 overflow-hidden hidden" id="settings-dropdown">
+<div class="py-2 px-3 flex flex-col gap-3">
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-xs font-ui-label text-on-surface dark:text-inverse-on-surface">Темная тема</span>
+<input checked="" class="form-checkbox h-3 w-3 text-primary rounded border-subtle" id="theme-toggle" onchange="toggleTheme(this.checked)" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-xs font-ui-label text-on-surface dark:text-inverse-on-surface">Клавиатура</span>
+<input checked="" class="form-checkbox h-3 w-3 text-primary rounded border-subtle" id="keyboard-toggle" onchange="toggleKeyboardSetting(this.checked)" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+<button class="p-1 text-primary dark:text-primary-fixed" onclick="toggleProfileModal()"><span class="material-symbols-outlined text-[20px]">account_circle</span></button>
+</div>
+</div>
+</div>
+<!-- Mobile Navigation Pills (Only visible on small screens) -->
+<div class="w-full overflow-x-auto no-scrollbar pb-2 md:hidden">
+<div class="max-w-[750px] mx-auto px-4">
+<nav class="flex items-center gap-1 bg-surface-container-low dark:bg-surface-container-highest p-1 rounded-full w-max mx-auto">
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high text-text-muted whitespace-nowrap" id="level-letter-mobile" onclick="switchLevel('letter')">Буква</button>
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] active bg-primary text-on-primary shadow-sm whitespace-nowrap" id="level-word-mobile" onclick="switchLevel('word')">Слово</button>
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high text-text-muted whitespace-nowrap" id="level-sentence-mobile" onclick="switchLevel('sentence')">Фраза</button>
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high text-text-muted whitespace-nowrap" id="level-text-mobile" onclick="switchLevel('text')">Текст</button>
+</nav>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col items-center relative overflow-hidden pt-8 pb-32">
+<div class="w-full max-w-[750px] px-gutter flex flex-col items-center relative h-full justify-between mx-auto">
+<!-- Start State View -->
+<div class="flex flex-col items-center gap-4 mt-12" id="start-state">
+<div class="w-16 h-16 rounded-full bg-primary-fixed-dim flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-3xl text-primary">play_arrow</span>
+</div>
+<div class="text-center">
+<h2 class="text-xl font-bold text-primary dark:text-primary-fixed mb-1" id="mode-title">Орфография</h2>
+<p class="text-text-muted text-sm max-w-xs mx-auto">Закрепите правильное написание слов.</p>
+</div>
+<button class="mt-4 px-8 py-3 bg-primary text-on-primary rounded-full font-ui-label text-base shadow-lg hover:shadow-xl hover:scale-105 transition-all w-full sm:w-auto sm:min-w-[200px]" onclick="startSession()">Начать</button>
+</div>
+<!-- Training View -->
+<div class="w-full flex flex-col items-center hidden h-full justify-between" id="training-state">
+<div class="w-full flex flex-col items-center flex-grow justify-center pb-8">
+<!-- Word Area -->
+<div class="relative mb-6 text-center w-full">
+<h1 class="font-word-display text-word-display-mobile md:text-word-display text-primary dark:text-primary-fixed flex items-center justify-center gap-0 tracking-wider select-none whitespace-pre-wrap px-2 leading-tight" id="word-container"></h1>
+<p class="mt-4 font-ui-label text-[10px] text-text-muted h-4" id="instruction-text">введите пропущенную букву</p>
+</div>
+<!-- Feedback Area -->
+<div class="h-10 transition-opacity duration-300 flex items-center justify-center opacity-0 mb-4" id="feedback-area">
+<span class="text-success font-ui-label text-xs flex items-center gap-1 bg-success/10 px-4 py-1.5 rounded-full border border-success/20" id="feedback-container">
+<span class="material-symbols-outlined text-[16px]" id="feedback-icon">check_circle</span>
+<span class="" id="feedback-text">верно!</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Controls & Keyboard Wrapper -->
+<div class="fixed bottom-0 w-full z-50 flex flex-col items-center">
+<!-- Keyboard/Input feedback -->
+<div class="flex flex-col items-center w-full bg-surface/95 dark:bg-inverse-surface/95 backdrop-blur-sm px-1 py-3 border-t border-subtle" id="orthography-keyboard-container" style="gap: 10px;">
+<div class="w-full max-w-[750px] flex flex-col items-center mx-auto" id="orthography-keyboard" style="display: none; gap: 10px;"></div>
+</div>
+<!-- Bottom Stats Bar -->
+<footer class="w-full border-t border-subtle bg-surface dark:bg-inverse-surface pb-safe">
+<div class="max-w-[750px] mx-auto flex justify-between items-center h-16 px-4 w-full">
+<div class="flex gap-4 items-center flex-1">
+<div class="flex flex-col items-center min-w-[50px]">
+<span class="font-stats-label text-stats-label text-text-muted uppercase tracking-wider text-[8px]">Решено</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-solved">0</span>
+</div>
+<div class="flex flex-col items-center min-w-[50px]">
+<span class="font-stats-label text-stats-label text-text-muted uppercase tracking-wider text-[8px]">Успех</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-success">0%</span>
+</div>
+</div>
+<div class="flex items-center justify-center flex-1">
+<div class="invisible" id="session-controls">
+<button class="p-2 bg-error/10 text-error rounded-full font-ui-label text-[10px] border border-error/20 hover:bg-error hover:text-white transition-all flex items-center gap-1 shadow-sm whitespace-nowrap" id="end-session-button" onclick="endSession()">
+<span class="material-symbols-outlined text-[14px]">stop_circle</span>
+                            Завершить
+            </button>
+</div>
+</div>
+<div class="flex gap-4 items-center justify-end flex-1">
+<div class="flex flex-col items-center min-w-[50px]">
+<span class="font-stats-label text-stats-label text-text-muted uppercase tracking-wider text-[8px]">Серия</span>
+<div class="flex items-center gap-0.5">
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-streak">0</span>
+<span class="material-symbols-outlined text-[12px] text-on-tertiary-container" style='font-variation-settings: "FILL" 1;'>local_fire_department</span>
+</div>
+</div>
+<div class="flex flex-col items-center min-w-[50px]">
+<span class="font-stats-label text-stats-label text-text-muted uppercase tracking-wider text-[8px]">Время</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-time">00:00</span>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<!-- Profile Modal -->
+<div class="fixed inset-0 z-[60] bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-sm hidden items-center justify-center mx-auto" id="profile-modal">
+<div class="bg-surface dark:bg-inverse-surface border border-subtle rounded-t-xl sm:rounded-xl shadow-2xl w-full max-w-[750px] h-[90vh] sm:h-[80vh] flex flex-col overflow-hidden relative mt-auto sm:mt-0">
+<button class="absolute top-4 right-4 p-2 text-text-muted hover:text-primary transition-colors z-10" onclick="toggleProfileModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="px-gutter pt-6 pb-2 border-b border-subtle">
+<h2 class="text-xl font-bold text-primary dark:text-primary-fixed mb-4">Профиль</h2>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 font-ui-label text-sm text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed" id="tab-btn-stats" onclick="switchProfileTab('stats')">Статистика</button>
+<button class="px-3 py-1.5 font-ui-label text-sm text-text-muted border-b-2 border-transparent hover:text-primary" id="tab-btn-manage" onclick="switchProfileTab('manage')">Управление</button>
+</div>
+</div>
+<div class="flex-grow overflow-hidden relative">
+<!-- Statistics Tab -->
+<div class="absolute inset-0 p-gutter overflow-y-auto" id="tab-content-stats">
+<h3 class="text-sm font-ui-label text-on-surface dark:text-inverse-on-surface mb-3">Общая статистика</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+<div class="p-3 rounded-lg border border-subtle bg-surface-container-lowest dark:bg-surface-container">
+<div class="text-text-muted font-stats-label text-[10px] mb-1">Всего решено</div>
+<div class="text-xl font-stats-value text-primary dark:text-primary-fixed" id="profile-stat-solved">0</div>
+</div>
+<div class="p-3 rounded-lg border border-subtle bg-surface-container-lowest dark:bg-surface-container">
+<div class="text-text-muted font-stats-label text-[10px] mb-1">Процент успеха</div>
+<div class="text-xl font-stats-value text-primary dark:text-primary-fixed" id="profile-stat-success">0%</div>
+</div>
+<div class="p-3 rounded-lg border border-subtle bg-surface-container-lowest dark:bg-surface-container sm:col-span-2">
+<div class="text-text-muted font-stats-label text-[10px] mb-1">Слова в кэше</div>
+<div class="text-xl font-stats-value text-primary dark:text-primary-fixed" id="profile-stat-words">0</div>
+</div>
+</div>
+</div>
+<!-- Management Tab -->
+<div class="absolute inset-0 hidden flex-col" id="tab-content-manage">
+<div class="w-full border-b border-subtle p-3 flex flex-col gap-2 relative">
+<h3 class="font-ui-label text-text-muted px-2 py-1 uppercase text-[10px] tracking-wider">Дисциплины</h3>
+<div class="flex gap-2">
+<div class="relative flex-1">
+<button class="w-full text-left px-3 py-2 rounded-lg font-ui-label text-sm text-primary dark:text-primary-fixed bg-primary/10 transition-colors flex justify-between items-center disc-btn" id="disc-ortho-btn" onclick="toggleDisciplineMenu('orthography', event)">
+                            Орфография
+</button>
+</div>
+<div class="relative flex-1">
+<button class="w-full text-left px-3 py-2 rounded-lg font-ui-label text-sm text-text-muted hover:bg-surface-container transition-colors flex justify-between items-center disc-btn" id="disc-stress-btn" onclick="toggleDisciplineMenu('stress', event)">
+                            Ударение
+</button>
+</div>
+</div>
+</div>
+<div class="w-full flex-grow p-gutter bg-surface-container-lowest dark:bg-surface-container overflow-y-auto">
+<h3 class="text-base font-bold text-primary dark:text-primary-fixed mb-1" id="horizon-title">Горизонт: Орфография</h3>
+<p class="text-text-muted font-ui-label text-xs mb-4">Выбранные уровни языка для тренировки.</p>
+<div class="flex flex-col gap-2" id="horizon-list">
+<div class="p-3 bg-surface dark:bg-inverse-surface border border-subtle rounded-lg flex justify-between items-center"><span class="font-ui-label text-sm">Буква</span><input checked="" class="form-checkbox text-primary rounded border-subtle" type="checkbox"/></div>
+<div class="p-3 bg-surface dark:bg-inverse-surface border border-subtle rounded-lg flex justify-between items-center"><span class="font-ui-label text-sm">Слово</span><input checked="" class="form-checkbox text-primary rounded border-subtle" type="checkbox"/></div>
+<div class="p-3 bg-surface dark:bg-inverse-surface border border-subtle rounded-lg flex justify-between items-center"><span class="font-ui-label text-sm">Фраза</span><input checked="" class="form-checkbox text-primary rounded border-subtle" type="checkbox"/></div>
+<div class="p-3 bg-surface dark:bg-inverse-surface border border-subtle rounded-lg flex justify-between items-center"><span class="font-ui-label text-sm">Текст</span><input checked="" class="form-checkbox text-primary rounded border-subtle" type="checkbox"/></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+    const DATA = [
+        { word: "ИНТЕЛЛЕКТ", index: 5, type: "orthography", resolutionLvl: "word" },
+        { word: "КАТАЛОГ", index: 5, type: "stress", resolutionLvl: "word" },
+        { word: "МОЛОКО", index: 1, type: "orthography", resolutionLvl: "word" },
+        { word: "ДОГОВОР", index: 5, type: "stress", resolutionLvl: "word" },
+        { word: "АГЕНТ", index: 2, type: "stress", resolutionLvl: "word" },
+        { word: "пребывать в городе", index: 2, type: "orthography", resolutionLvl: "sentence" },
+        { word: "несмотря на", index: 92, type: "orthography", resolutionLvl: "sentence" },
+        { word: "не смотря", index: 2, type: "orthography", resolutionLvl: "sentence" },
+        { word: "В этом длинном тексте пропущена важная буква, чтобы проверить ваши навыки чтения и понимания контекста.", index: 43, type: "orthography", resolutionLvl: "text" },
+        { word: "Он не ожидал такого поворота событий, но решил двигаться дальше.", index: 12, type: "orthography", resolutionLvl: "text" }
+    ];
+
+    let currentMode = 'orthography';
+    let currentLevel = 'word';
+    let isSessionActive = false;
+    let currentTask = null;
+    let mistakesInWord = 0;
+    let solvedCount = 0;
+    let attemptsCount = 0;
+    let streakCount = 0;
+    let seconds = 0;
+    let wordSeconds = 0;
+    let timerInterval = null;
+    let randomLevels = false;
+    let showKeyboardSetting = true;
+
+    let appStats = {};
+    function loadStats() {}
+    function saveStats() {}
+
+    function updateWordStats(word, type, level, solved, attempts, time) {
+        if (!appStats[word]) {
+            appStats[word] = { solved: 0, attempts: 0, successRate: 0, type: type, resolutionLvl: level, avgTime: 0 };
+        }
+        
+        const st = appStats[word];
+        const oldTotalTime = st.avgTime * st.solved;
+        
+        if (solved > 0) {
+            st.solved += solved;
+            st.avgTime = (oldTotalTime + time) / st.solved;
+        }
+        st.attempts += attempts;
+        if (st.attempts > 0) {
+            st.successRate = Math.round((st.solved / st.attempts) * 100);
+        }
+        
+        updateGlobalStatsFromCache();
+    }
+    
+    function updateGlobalStatsFromCache() {
+        let globalSolved = 0;
+        let globalAttempts = 0;
+        
+        for (const key in appStats) {
+            if (appStats[key].type === currentMode) {
+                globalSolved += appStats[key].solved;
+                globalAttempts += appStats[key].attempts;
+            }
+        }
+        
+        solvedCount = globalSolved;
+        attemptsCount = globalAttempts;
+        updateStatsDisplay();
+    }
+
+    const hiddenInput = document.getElementById('hidden-input');
+        function resolveGap(symbol) {
+                if (symbol === 'backspace') {return 'gap-0';
+                }
+                if (symbol === '-') {return 'gap-1';
+                }
+                if (symbol === ' ') {return 'gap-3';
+                }               
+                return 'gap-2';
+        }
+        function getStructureType(symbol) {
+                if (symbol === 'backspace') {return 'collapse';
+                }
+
+                if (symbol === '-') {return 'weak-break';
+                }
+
+                if (symbol === ' ') {return 'strong-break';
+                }
+                return 'merged';
+        }
+        function setGap(wrapper, gapClass) {
+                wrapper.className = wrapper.className.replace(/\bgap-\d+\b/g, '');
+                wrapper.classList.add(gapClass);
+        }
+        function setSlotEmpty(slot, isEmpty) {
+                if (isEmpty) {
+                        slot.classList.add('ortho-empty');
+                } else {
+                        slot.classList.remove('ortho-empty');
+                }
+        }
+        function setSlotCollapsed(slot, collapsed) {
+                if (collapsed) {
+                        slot.classList.add('slot-collapsed');
+                } else {
+                        slot.classList.remove('slot-collapsed');
+                }
+        }
+
+    hiddenInput.addEventListener('input', (e) => {
+        if (!isSessionActive || currentMode !== 'orthography' || !currentTask) return;
+        const char = e.target.value.slice(-1).toLowerCase();
+        if (char && char.match(/[а-яё\-\s]/i)) {
+            handleOrthography(char);
+        }
+        e.target.value = '';
+    });
+
+    hiddenInput.addEventListener('keydown', (e) => {
+        if (!isSessionActive || currentMode !== 'orthography' || !currentTask) return;
+        if (e.key === 'Backspace') {
+            handleOrthography('backspace');
+        } else if (e.key === ' ') {
+            handleOrthography(' ');
+            e.preventDefault();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (isSessionActive && currentMode === 'orthography') {
+            if (!e.target.closest('#profile-modal') && !e.target.closest('#mode-dropdown') && !e.target.closest('#settings-dropdown')) {
+                hiddenInput.focus();
+            }
+        }
+    });
+
+    function toggleTheme(isDark) {
+        document.documentElement.classList.toggle('dark', isDark);
+        document.documentElement.classList.toggle('light', !isDark);
+    }
+
+    function toggleKeyboardSetting(show) {
+        showKeyboardSetting = show;
+        updateKeyboardVisibility();
+    }
+
+    function updateKeyboardVisibility() {
+        const kb = document.getElementById('orthography-keyboard');
+        const container = document.getElementById('orthography-keyboard-container');
+        if (currentMode === 'orthography' && showKeyboardSetting && isSessionActive) {
+            kb.style.display = 'flex';
+            container.style.display = 'flex';
+        } else {
+            kb.style.display = 'none';
+            container.style.display = 'none';
+        }
+    }
+
+    function toggleRandomLevels() {
+        randomLevels = !randomLevels;
+        const btn = document.getElementById('btn-random-levels');
+        if (randomLevels) {
+            btn.classList.remove('text-text-muted');
+            btn.classList.add('text-primary');
+        } else {
+            btn.classList.remove('text-primary');
+            btn.classList.add('text-text-muted');
+        }
+        if (isSessionActive) {
+            next();
+        }
+    }
+
+    function getRandomWord() {
+        let available = DATA.filter(d => d.type === currentMode);
+        if (!randomLevels) {
+            available = available.filter(d => d.resolutionLvl === currentLevel);
+        }
+        if (available.length === 0) {
+            available = DATA.filter(d => d.type === currentMode);
+        }
+        return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function switchMode(mode) {
+        if (isSessionActive) {
+            if (!confirm('Текущая сессия будет завершена. Продолжить?')) return;
+            endSession();
+        }
+        
+        currentMode = mode;
+        const orthBtn = document.getElementById('menu-orthography');
+        const stressBtn = document.getElementById('menu-stress');
+        
+        if (orthBtn) orthBtn.className = 'w-full px-4 py-2 text-left text-sm text-text-muted hover:bg-surface-container-low transition-colors font-ui-label';
+        if (stressBtn) stressBtn.className = 'w-full px-4 py-2 text-left text-sm text-text-muted hover:bg-surface-container-low transition-colors font-ui-label';
+        
+        const activeMenu = document.getElementById(`menu-${mode}`);
+        if (activeMenu) activeMenu.className = 'w-full px-4 py-2 text-left text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-ui-label';
+        
+        document.getElementById('current-mode-label').textContent = mode === 'orthography' ? 'Орфография' : 'Ударение';
+        document.getElementById('mode-dropdown').classList.add('hidden');
+
+        const textLvls = [document.getElementById('level-text'), document.getElementById('level-text-mobile')];
+        const sentenceLvls = [document.getElementById('level-sentence'), document.getElementById('level-sentence-mobile')];
+        
+        if (mode === 'stress') {
+            textLvls.forEach(el => el && el.classList.add('disabled'));
+            sentenceLvls.forEach(el => el && el.classList.remove('text-text-muted'));
+            sentenceLvls.forEach(el => el && el.classList.add('disabled'));
+            if (currentLevel === 'text' || currentLevel === 'sentence') switchLevel('word');
+        } else {
+            textLvls.forEach(el => el && el.classList.remove('disabled'));
+            sentenceLvls.forEach(el => el && el.classList.remove('disabled'));
+        }
+
+        document.getElementById('mode-title').textContent = mode === 'orthography' ? 'Орфография' : 'Ударения';
+        updateGlobalStatsFromCache();
+        updateKeyboardVisibility();
+    }
+    
+    function switchLevel(level, force = false) {
+        currentLevel = level;
+        document.querySelectorAll('.level-button').forEach(btn => {
+            btn.classList.remove('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+            if(!btn.classList.contains('disabled')) btn.classList.add('text-text-muted');
+        });
+        
+        const activeBtns = [document.getElementById(`level-${level}`), document.getElementById(`level-${level}-mobile`)];
+        activeBtns.forEach(activeBtn => {
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+                activeBtn.classList.remove('text-text-muted');
+            }
+        });
+
+        if (isSessionActive && !force && !randomLevels) {
+            next();
+        }
+    }
+
+    function startSession() {
+        isSessionActive = true;
+        document.getElementById('start-state').classList.add('hidden');
+        document.getElementById('training-state').classList.remove('hidden');
+        document.getElementById('session-controls').classList.remove('invisible');
+        
+        seconds = 0;
+        mistakesInWord = 0;
+        updateTimeDisplay();
+        timerInterval = setInterval(() => {
+            seconds++;
+            wordSeconds++;
+            updateTimeDisplay();
+        }, 1000);
+
+        next();
+    }
+
+    function endSession() {
+        isSessionActive = false;
+        clearInterval(timerInterval);
+        document.getElementById('start-state').classList.remove('hidden');
+        document.getElementById('training-state').classList.add('hidden');
+        document.getElementById('session-controls').classList.add('invisible');
+        document.getElementById('word-container').innerHTML = '';
+        document.getElementById('feedback-area').classList.add('opacity-0');
+        document.getElementById('orthography-keyboard').style.display = 'none';
+        document.getElementById('orthography-keyboard-container').style.display = 'none';
+        hiddenInput.blur();
+    }
+
+    function next() {
+        mistakesInWord = 0;
+        wordSeconds = 0;
+        document.getElementById('feedback-area').classList.add('opacity-0');
+        currentTask = getRandomWord();
+        
+        if (currentTask.resolutionLvl) {
+            switchLevel(currentTask.resolutionLvl, true);
+        }
+        
+        renderTask(currentTask);
+        if (currentMode === 'orthography') {
+            setTimeout(() => hiddenInput.focus(), 50);
+            updateKeyboardVisibility();
+        }
+    }
+
+    function renderTask(item) {
+        const wordEl = document.getElementById('word-container');
+        const keyboard = document.getElementById('orthography-keyboard');
+        const instruction = document.getElementById('instruction-text');
+        
+        keyboard.innerHTML = "";
+        wordEl.innerHTML = "";
+        const displayText = item.word.toLowerCase();
+
+        if (item.type === "orthography") {
+            instruction.textContent = 'введите пропущенную букву';
+
+            let expectedInput = '';
+            let correctCharToRender = '';
+            let before = '';
+            let after = '';
+
+            const strIdx = String(item.index);
+                        if (strIdx.length >= 2) {
+                                const x = parseInt(strIdx[0], 10);
+                                const y = parseInt(strIdx.slice(1), 10); 
+                                if (x === 9) {
+                                        before = displayText.slice(0, y);
+                                        after = displayText.slice(y);
+                                        expectedInput = 'backspace';
+                                        correctCharToRender = '';
+                                } else {
+                                        before = displayText.slice(0, y);
+                                        after = displayText.slice(y + 1); 
+                                        expectedInput = displayText[x] ? displayText[x].toLowerCase() : '';
+                                        correctCharToRender = expectedInput;
+                                }
+                        } else {
+                                const idx = parseInt(strIdx, 10);
+                                before = displayText.slice(0, idx);
+                                after = displayText.slice(idx + 1);
+                                expectedInput = displayText[idx] ? displayText[idx].toLowerCase() : '';
+                                correctCharToRender = expectedInput;
+                        }
+
+            currentTask.expectedInput = expectedInput;
+            currentTask.correctCharToRender = correctCharToRender;
+
+            if (displayText.length > 20) {
+                wordEl.classList.add('text-lg', 'md:text-2xl');
+                wordEl.classList.remove('text-word-display-mobile', 'md:text-word-display');
+            } else {
+                wordEl.classList.remove('text-lg', 'md:text-2xl');
+                wordEl.classList.add('text-word-display-mobile', 'md:text-word-display');
+            }
+
+            let initialGapClass = 'gap-2'; 
+            if (expectedInput === '-') {
+                initialGapClass = 'gap-1'; 
+            } else if (expectedInput === 'backspace') {
+                initialGapClass = 'gap-2'; 
+            }
+
+            const slotWidthClass = 'w-[1ch]';
+
+            const markup = `<div id="ortho-wrapper" class="flex items-center justify-center ${initialGapClass} ortho-gap-converge w-full transition-all duration-300">
+                <span class="flex-shrink-0 text-right">${before}</span>
+                <span id="ortho-slot" class="${slotWidthClass} text-center border-b-4 border-primary dark:border-primary-fixed text-transparent transition-all duration-300 flex-shrink-0 h-[1.2em]"></span>
+                <span class="flex-shrink-0 text-left">${after}</span>
+            </div>`;
+            wordEl.innerHTML = markup;
+
+            currentTask.initialGapClass = initialGapClass;
+            
+            const requestedLayout = [
+                ['й','ц','у','к','е','н','г','ш','щ','з','х','ъ'],
+                ['ф','ы','в','а','п','р','о','л','д','ж','э','ё'],
+                ['-', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', 'backspace'],
+                ['space']
+            ];
+            
+            requestedLayout.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'keyboard-row max-w-[500px]';
+                row.forEach(key => {
+                    const b = document.createElement("button");
+                    if (key === null) {
+                        b.className = "keyboard-key-placeholder";
+                    } else if (key === 'space') {
+                        b.className = "keyboard-key-wide";
+                        b.innerText = "пробел";
+                        b.onclick = () => handleOrthography(' ');
+                    } else if (key === 'backspace') {
+                        b.className = "keyboard-key";
+                        b.style.flex = "1.5";
+                        b.innerHTML = '<span class="material-symbols-outlined text-[20px]">backspace</span>';
+                        b.onclick = () => handleOrthography('backspace');
+                    } else {
+                        b.className = "keyboard-key";
+                        b.innerText = key;
+                        b.onclick = () => handleOrthography(key);
+                    }
+                    rowDiv.appendChild(b);
+                });
+                keyboard.appendChild(rowDiv);
+            });
+            updateKeyboardVisibility();
+        }
+
+        if (item.type === "stress") {
+            keyboard.style.display = 'none';
+            document.getElementById('orthography-keyboard-container').style.display = 'none';
+            instruction.textContent = 'кликните по ударной гласной';
+            wordEl.classList.remove('text-lg', 'md:text-2xl');
+            wordEl.classList.add('text-word-display-mobile', 'md:text-word-display');
+
+            displayText.split("").forEach((ch, i) => {
+                if (i === item.index) {
+                    const btn = document.createElement('button');
+                    btn.className = 'vowel-button px-1 cursor-pointer';
+                    btn.textContent = ch;
+                    btn.onclick = () => handleStress(true, btn);
+                    wordEl.appendChild(btn);
+                } else if ("аеёиоуыэюя".includes(ch)) {
+                    const btn = document.createElement('button');
+                    btn.className = 'vowel-button px-1 cursor-pointer';
+                    btn.textContent = ch;
+                    btn.onclick = () => handleStress(false, btn);
+                    wordEl.appendChild(btn);
+                } else {
+                    const span = document.createElement('span');
+                    span.textContent = ch;
+                    wordEl.appendChild(span);
+                }
+            });
+        }
+    }
+        function handleOrthography(ch) {
+                if (!currentTask || currentMode !== 'orthography') return;
+
+                ch = ch.toLowerCase();
+                const expected = currentTask.expectedInput.toLowerCase();
+                const renderChar = currentTask.correctCharToRender.toLowerCase();
+
+                const slot = document.getElementById('ortho-slot');
+                const wrapper = document.getElementById('ortho-wrapper');
+
+                if (!slot || !wrapper) return;
+
+                setGap(wrapper, resolveGap(ch));
+
+                if (ch === expected) {
+                        streakCount = (mistakesInWord === 0) ? streakCount + 1 : 0;
+                        updateWordStats(currentTask.word, currentTask.type, currentTask.resolutionLvl, 1, 1, wordSeconds);
+
+                        slot.classList.remove('border-b-4', 'text-transparent', 'text-error');
+                        slot.classList.add('text-primary');
+                        if (document.documentElement.classList.contains('dark')) {
+                            slot.classList.add('dark:text-primary-fixed');
+                        }
+
+                        if (ch === 'backspace') {
+                                slot.textContent = '';
+                                setSlotCollapsed(slot, true);
+                                setGap(wrapper, 'gap-0');
+                        } else if (ch === '-') {
+                                slot.textContent = '-';
+                                setSlotCollapsed(slot, false);
+                                setGap(wrapper, 'gap-1');
+                        } else if (ch === ' ') {
+                                slot.textContent = '';
+                                setSlotCollapsed(slot, false);
+                                setGap(wrapper, 'gap-2');
+                        } else {
+                                slot.textContent = renderChar;
+                                setSlotEmpty(slot, false);
+                                setSlotCollapsed(slot, false);
+                                setGap(wrapper, 'gap-0'); 
+                        }
+
+                        showFeedback(true, "Верно!");
+                        setTimeout(next, 700);
+                        return;
+                }
+
+                mistakesInWord++;
+                streakCount = 0;
+                updateWordStats(currentTask.word, currentTask.type, currentTask.resolutionLvl, 0, 1, wordSeconds);
+
+                slot.classList.remove('text-transparent');
+                slot.classList.add('text-error');
+
+                if (ch === 'backspace') {
+                        slot.textContent = '⌫';
+                        setSlotEmpty(slot, false);
+                } else if (ch === ' ') {
+                        slot.textContent = '';
+                        setSlotEmpty(slot, true);
+                } else {
+                        slot.textContent = ch;
+                        setSlotEmpty(slot, false);
+                }
+                setSlotCollapsed(slot, false);
+
+                showFeedback(false, "Ошибка!");
+
+                setTimeout(() => {
+                        slot.textContent = '';
+                        setSlotEmpty(slot, true);
+                        slot.classList.remove('text-error');
+                        setGap(wrapper, currentTask.initialGapClass);
+                        setSlotCollapsed(slot, false);
+                }, 500);
+        }
+    function handleStress(correct, element) {
+        if (element.classList.contains('correct') || element.classList.contains('wrong')) return;
+        if (correct) {
+            if (mistakesInWord === 0) streakCount++; else streakCount = 0;
+            updateWordStats(currentTask.word, currentTask.type, currentTask.resolutionLvl, 1, 1, wordSeconds);
+            element.classList.add('correct');
+            showFeedback(true, "Верно!");
+            setTimeout(next, 700);
+        } else {
+            mistakesInWord++;
+            streakCount = 0;
+            updateWordStats(currentTask.word, currentTask.type, currentTask.resolutionLvl, 0, 1, wordSeconds);
+            element.classList.add('wrong');
+            showFeedback(false, "Ошибка!");
+            setTimeout(() => element.classList.remove('wrong'), 400);
+        }
+    }
+
+    function showFeedback(isSuccess, text) {
+        const area = document.getElementById('feedback-area');
+        const container = document.getElementById('feedback-container');
+        const icon = document.getElementById('feedback-icon');
+        const textEl = document.getElementById('feedback-text');
+        if (!textEl) return;
+        textEl.textContent = text;
+        if (isSuccess) {
+            container.className = "text-success font-ui-label text-xs flex items-center gap-1 bg-success/10 px-4 py-1.5 rounded-full border border-success/20";
+            icon.textContent = "check_circle";
+        } else {
+            container.className = "text-error font-ui-label text-xs flex items-center gap-1 bg-error/10 px-4 py-1.5 rounded-full border border-error/20";
+            icon.textContent = "error";
+        }
+        area.classList.remove('opacity-0');
+    }
+
+    function updateStatsDisplay() {
+        document.getElementById('stat-solved').textContent = solvedCount;
+        document.getElementById('stat-streak').textContent = streakCount;
+        const successRate = attemptsCount === 0 ? 0 : Math.round((solvedCount / attemptsCount) * 100);
+        document.getElementById('stat-success').textContent = `${successRate}%`;
+    }
+
+    function updateTimeDisplay() {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        document.getElementById('stat-time').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function toggleProfileModal() {
+        const modal = document.getElementById('profile-modal');
+        modal.classList.toggle('hidden');
+        modal.classList.toggle('flex');
+    }
+    
+    function switchProfileTab(tab) {
+        const statsTab = document.getElementById('tab-content-stats');
+        const manageTab = document.getElementById('tab-content-manage');
+        const statsBtn = document.getElementById('tab-btn-stats');
+        const manageBtn = document.getElementById('tab-btn-manage');
+        
+        if (tab === 'stats') {
+            statsTab.classList.remove('hidden');
+            manageTab.classList.add('hidden');
+            manageTab.classList.remove('flex');
+            statsBtn.className = "px-3 py-1.5 font-ui-label text-sm text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed";
+            manageBtn.className = "px-3 py-1.5 font-ui-label text-sm text-text-muted border-b-2 border-transparent hover:text-primary";
+        } else {
+            statsTab.classList.add('hidden');
+            manageTab.classList.remove('hidden');
+            manageTab.classList.add('flex');
+            statsBtn.className = "px-3 py-1.5 font-ui-label text-sm text-text-muted border-b-2 border-transparent hover:text-primary";
+            manageBtn.className = "px-3 py-1.5 font-ui-label text-sm text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed";
+        }
+    }
+
+    function toggleDisciplineMenu(disc, e) {
+        const orthoBtn = document.getElementById('disc-ortho-btn');
+        const stressBtn = document.getElementById('disc-stress-btn');
+        const title = document.getElementById('horizon-title');
+        
+        if (disc === 'orthography') {
+            orthoBtn.className = "w-full text-left px-3 py-2 rounded-lg font-ui-label text-sm text-primary dark:text-primary-fixed bg-primary/10 transition-colors flex justify-between items-center disc-btn";
+            stressBtn.className = "w-full text-left px-3 py-2 rounded-lg font-ui-label text-sm text-text-muted hover:bg-surface-container transition-colors flex justify-between items-center disc-btn";
+            title.textContent = "Горизонт: Орфография";
+        } else {
+            stressBtn.className = "w-full text-left px-3 py-2 rounded-lg font-ui-label text-sm text-primary dark:text-primary-fixed bg-primary/10 transition-colors flex justify-between items-center disc-btn";
+            orthoBtn.className = "w-full text-left px-3 py-2 rounded-lg font-ui-label text-sm text-text-muted hover:bg-surface-container transition-colors flex justify-between items-center disc-btn";
+            title.textContent = "Горизонт: Ударение";
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        const modeDropdown = document.getElementById('mode-dropdown');
+        const modeButton = document.getElementById('menu-dropdown-button');
+        if (modeButton && !modeButton.contains(event.target) && modeDropdown && !modeDropdown.contains(event.target)) {
+            modeDropdown.classList.add('hidden');
+        }
+
+        const settingsDropdown = document.getElementById('settings-dropdown');
+        const settingsButton = document.getElementById('settings-dropdown-button');
+        if (settingsButton && settingsDropdown && !settingsButton.contains(event.target) && !settingsDropdown.contains(event.target)) {
+            settingsDropdown.classList.add('hidden');
+        }
+        
+        const resetDropdown = document.getElementById('reset-dropdown');
+        const resetButton = document.getElementById('btn-reset-stats');
+        if (resetButton && resetDropdown && !resetButton.contains(event.target) && !resetDropdown.contains(event.target)) {
+            resetDropdown.classList.add('hidden');
+        }
+    });
+</script>
+</body></html>
