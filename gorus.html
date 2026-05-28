@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="tailwind-config.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<header class="w-full top-0 sticky border-b border-subtle dark:border-outline bg-surface dark:bg-text-main z-40">
+<div class="w-full px-gutter">
+<div class="flex items-center justify-between py-3 gap-2 sm:gap-4 relative">
+<div class="flex items-center">
+<div class="relative">
+<button class="flex items-center gap-1 p-1 px-2 text-primary dark:text-primary-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-colors rounded-full min-w-0" id="menu-dropdown-button" onclick="document.getElementById('mode-dropdown').classList.toggle('hidden'); event.stopPropagation()" title="Выбор режима">
+<span class="material-symbols-outlined text-[20px]">menu</span>
+<span class="font-ui-label text-xs" id="current-mode-label">Орфография</span>
+</button>
+<div class="absolute left-0 mt-2 w-48 bg-surface dark:bg-text-main border border-subtle dark:border-outline rounded-lg shadow-xl z-50 overflow-hidden hidden" id="mode-dropdown">
+<div class="py-1">
+<button class="w-full px-4 py-2 text-left text-sm bg-primary/10 text-primary dark:text-primary-fixed hover:bg-primary/20 transition-colors font-ui-label" id="menu-orthography" onclick="switchMode('orthography')">Орфография</button>
+<button class="w-full px-4 py-2 text-left text-sm text-text-muted hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-colors font-ui-label" id="menu-stress" onclick="switchMode('stress')">Ударение</button>
+<button class="w-full px-4 py-2 text-left text-sm text-text-muted hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-colors font-ui-label border-t border-subtle dark:border-outline" id="menu-profile" onclick="switchAppMode('profile')">Профиль</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Level Pills -->
+<nav class="hidden md:flex items-center gap-1 bg-surface-container-low dark:bg-inverse-surface p-1 rounded-full overflow-hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2" id="main-level-nav">
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high dark:hover:bg-surface-container-low whitespace-nowrap text-text-muted" id="level-letter" onclick="switchLevel('letter')">Буква</button>
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] whitespace-nowrap active bg-primary text-on-primary shadow-sm" id="level-word" onclick="switchLevel('word')">Слово</button>
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high dark:hover:bg-surface-container-low text-text-muted whitespace-nowrap" id="level-sentence" onclick="switchLevel('sentence')">Предложение</button>
+<button class="level-button flex items-center gap-1 px-4 py-1.5 transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high dark:hover:bg-surface-container-low whitespace-nowrap text-text-muted" id="level-text" onclick="switchLevel('text')">Текст</button>
+</nav>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:text-primary transition-colors text-primary dark:text-primary-fixed" id="btn-random-levels" onclick="toggleRandomLevels()"><span class="material-symbols-outlined text-[20px]">restart_alt</span></button>
+<div class="relative">
+<button class="p-1 text-text-muted hover:text-primary transition-colors" id="settings-dropdown-button" onclick="document.getElementById('settings-dropdown').classList.toggle('hidden'); event.stopPropagation()" title="Настройки">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="absolute right-0 mt-2 w-48 bg-surface dark:bg-text-main border border-subtle dark:border-outline rounded-lg shadow-xl z-50 overflow-hidden hidden" id="settings-dropdown">
+<div class="py-2 px-3 flex flex-col gap-3">
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-xs font-ui-label text-on-surface dark:text-inverse-on-surface">Темная тема</span>
+<input checked="" class="form-checkbox h-3 w-3 text-primary rounded border-subtle" id="theme-toggle" onchange="toggleTheme(this.checked)" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer">
+<span class="text-xs font-ui-label text-on-surface dark:text-inverse-on-surface">Клавиатура</span>
+<input checked="" class="form-checkbox h-3 w-3 text-primary rounded border-subtle" id="keyboard-toggle" onchange="toggleKeyboardSetting(this.checked)" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Mobile Level Pills -->
+<div class="w-full overflow-x-auto no-scrollbar pb-2 md:hidden">
+<div class="mx-auto px-4">
+<nav class="flex items-center gap-1 bg-surface-container-low dark:bg-inverse-surface p-1 rounded-full w-max mx-auto" id="main-level-nav-mobile">
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high dark:hover:bg-surface-container-low whitespace-nowrap text-text-muted" id="level-letter-mobile" onclick="switchLevel('letter')">Буква</button>
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] whitespace-nowrap active bg-primary text-on-primary shadow-sm" id="level-word-mobile" onclick="switchLevel('word')">Слово</button>
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high dark:hover:bg-surface-container-low text-text-muted whitespace-nowrap" id="level-sentence-mobile" onclick="switchLevel('sentence')">Предложение</button>
+<button class="level-button flex items-center gap-1 px-pill-padding-x py-pill-padding-y transition-all rounded-full font-nav-pill text-[12px] hover:bg-surface-container-high dark:hover:bg-surface-container-low whitespace-nowrap text-text-muted" id="level-text-mobile" onclick="switchLevel('text')">Текст</button>
+</nav>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center relative overflow-hidden pt-8 pb-48">
+<div class="w-full max-w-[750px] px-gutter flex flex-col items-center relative h-full justify-center mx-auto">
+<!-- Start State View -->
+<div class="flex flex-col items-center gap-4 hidden" id="start-state">
+<div class="w-16 h-16 rounded-full bg-primary-fixed-dim dark:bg-primary/20 flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-3xl text-primary dark:text-primary-fixed">play_arrow</span>
+</div>
+<div class="text-center">
+<h2 class="text-xl font-bold text-primary dark:text-primary-fixed mb-1" id="mode-title">Орфография</h2>
+<p class="text-text-muted dark:text-surface-variant text-sm max-w-xs mx-auto">Закрепите правильное написание слов.</p>
+</div>
+<button class="mt-4 px-8 py-3 bg-primary text-on-primary dark:bg-primary-fixed-dim dark:text-on-primary-fixed rounded-full font-ui-label text-base shadow-lg hover:shadow-xl hover:scale-105 transition-all w-full sm:w-auto sm:min-w-[200px]" onclick="startSession()">Начать</button>
+</div>
+<!-- Training View -->
+<div class="w-full flex flex-col items-center h-full justify-center" id="training-state">
+<div class="w-full flex flex-col items-center">
+<div class="relative mb-6 text-center w-full">
+<h1 class="font-word-display flex items-center justify-center gap-0 tracking-wider select-none whitespace-normal break-words px-2 leading-tight w-full mx-auto" id="word-container"><div class="flex items-center justify-center gap-0"><span class="">инт</span><span class="w-[1ch] border-b-4 border-primary text-transparent mx-2 ortho-slot ortho-empty h-[1em]" id="ortho-slot"></span><span class="">ллект</span></div></h1>
+<p class="mt-4 font-ui-label text-[10px] text-text-muted dark:text-surface-variant h-4" id="instruction-text">введите пропущенную букву</p>
+</div>
+<div class="h-10 transition-opacity duration-300 flex items-center justify-center opacity-0" id="feedback-area">
+<span class="text-error font-ui-label text-xs flex items-center gap-1 bg-error/10 px-4 py-1.5 rounded-full border border-error/20" id="feedback-container">
+<span class="material-symbols-outlined text-[16px]" id="feedback-icon">error</span>
+<span class="" id="feedback-text">Ошибка!</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Profile View -->
+<div class="w-full max-w-[750px] mx-auto flex flex-col items-center hidden" id="profile-state">
+<div class="w-full bg-surface-container-low dark:bg-inverse-surface rounded-xl p-0 border border-subtle dark:border-outline shadow-2xl">
+<div class="px-6 py-4 flex items-center justify-between border-b border-subtle dark:border-outline">
+<h2 class="text-lg font-bold text-on-surface dark:text-inverse-on-surface">Профиль</h2>
+<button class="text-text-muted hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors" onclick="switchAppMode('training')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="px-6 py-2 flex items-center gap-6 border-b border-subtle dark:border-outline">
+<button class="py-2 text-sm font-ui-label text-text-muted hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors" id="tab-stats" onclick="switchProfileTab('stats')">Статистика</button>
+<button class="py-2 text-sm font-ui-label text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed" id="tab-manage" onclick="switchProfileTab('manage')">Управление</button>
+</div>
+<!-- Stats Content -->
+<div class="p-8 flex flex-col gap-8 hidden" id="profile-content-stats">
+<div>
+<h3 class="text-sm font-semibold text-text-muted dark:text-surface-variant mb-6 uppercase tracking-widest text-[10px]">Общая статистика</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+<div class="bg-surface dark:bg-text-main p-6 rounded-lg border border-subtle dark:border-outline">
+<p class="text-[10px] font-ui-label text-text-muted uppercase tracking-wider mb-2">Всего решено</p>
+<p class="text-3xl font-bold text-primary dark:text-primary-fixed" id="profile-solved-val">0</p>
+</div>
+<div class="bg-surface dark:bg-text-main p-6 rounded-lg border border-subtle dark:border-outline">
+<p class="text-[10px] font-ui-label text-text-muted uppercase tracking-wider mb-2">Процент успеха</p>
+<p class="text-3xl font-bold text-primary dark:text-primary-fixed" id="profile-success-val">0%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Manage Content -->
+<div class="p-8 flex flex-col gap-8" id="profile-content-manage">
+<h3 class="text-sm font-semibold text-text-muted dark:text-surface-variant mb-6 uppercase tracking-widest text-[10px]">Управление дисциплинами</h3>
+<div class="flex flex-col gap-4">
+<!-- Orthography Management Card -->
+<div class="bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center border border-primary/10 relative">
+<div class="flex items-center gap-3 mb-2 sm:mb-0">
+<div class="relative">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors relative z-10" onclick="toggleManageMenu('orthography'); event.stopPropagation()">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">tune</span>
+</button>
+<!-- Management Dropdown -->
+<div class="absolute left-0 top-full mt-2 w-56 bg-surface dark:bg-inverse-surface border border-subtle dark:border-outline rounded-xl shadow-2xl z-[60] overflow-hidden z-50 z-\[70\] hidden" id="manage-menu-orthography">
+<div class="p-3 flex flex-col gap-1">
+<p class="text-[10px] uppercase tracking-widest font-bold text-text-muted px-2 py-1">Уровни обучения</p>
+<label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container dark:hover:bg-surface-container-low cursor-pointer transition-colors group">
+<input checked="" class="w-4 h-4 rounded border-subtle text-primary focus:ring-primary" onchange="toggleLevelSelection('orthography', 'letter', this.checked)" type="checkbox"/>
+<span class="text-sm font-ui-label text-on-surface dark:text-inverse-on-surface">Буква</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container dark:hover:bg-surface-container-low cursor-pointer transition-colors group">
+<input checked="" class="w-4 h-4 rounded border-subtle text-primary focus:ring-primary" onchange="toggleLevelSelection('orthography', 'word', this.checked)" type="checkbox"/>
+<span class="text-sm font-ui-label text-on-surface dark:text-inverse-on-surface">Слово</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container dark:hover:bg-surface-container-low cursor-pointer transition-colors group">
+<input checked="" class="w-4 h-4 rounded border-subtle text-primary focus:ring-primary" onchange="toggleLevelSelection('orthography', 'sentence', this.checked)" type="checkbox"/>
+<span class="text-sm font-ui-label text-on-surface dark:text-inverse-on-surface">Предложение</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container dark:hover:bg-surface-container-low cursor-pointer transition-colors group">
+<input checked="" class="w-4 h-4 rounded border-subtle text-primary focus:ring-primary" onchange="toggleLevelSelection('orthography', 'text', this.checked)" type="checkbox"/>
+<span class="text-sm font-ui-label text-on-surface dark:text-inverse-on-surface">Текст</span>
+</label>
+</div>
+</div>
+</div>
+<span class="font-bold text-primary dark:text-primary-fixed text-lg">Орфография</span>
+</div>
+<div class="flex flex-wrap gap-2 text-[10px] text-text-muted" id="active-levels-orthography"><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Буква</span><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Слово</span><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Предложение</span><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Текст</span></div>
+</div>
+<!-- Stress Management Card -->
+<div class="bg-surface dark:bg-text-main rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center border border-subtle dark:border-outline relative">
+<div class="flex items-center gap-3 mb-2 sm:mb-0">
+<div class="relative">
+<button class="p-2 hover:bg-primary/10 text-text-muted hover:text-primary dark:text-surface-variant dark:hover:text-primary-fixed rounded-full transition-colors relative z-10" onclick="toggleManageMenu('stress'); event.stopPropagation()">
+<span class="material-symbols-outlined">tune</span>
+</button>
+<div class="absolute left-0 top-full mt-2 w-56 bg-surface dark:bg-inverse-surface border border-subtle dark:border-outline rounded-xl shadow-2xl z-[60] overflow-hidden hidden" id="manage-menu-stress">
+<div class="p-3 flex flex-col gap-1">
+<p class="text-[10px] uppercase tracking-widest font-bold text-text-muted px-2 py-1">Уровни обучения</p>
+<label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container dark:hover:bg-surface-container-low cursor-pointer transition-colors group">
+<input checked="" class="w-4 h-4 rounded border-subtle text-primary focus:ring-primary" onchange="toggleLevelSelection('stress', 'letter', this.checked)" type="checkbox"/>
+<span class="text-sm font-ui-label text-on-surface dark:text-inverse-on-surface">Буква</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container dark:hover:bg-surface-container-low cursor-pointer transition-colors group">
+<input checked="" class="w-4 h-4 rounded border-subtle text-primary focus:ring-primary" onchange="toggleLevelSelection('stress', 'word', this.checked)" type="checkbox"/>
+<span class="text-sm font-ui-label text-on-surface dark:text-inverse-on-surface">Слово</span>
+</label>
+</div>
+</div>
+</div>
+<span class="font-bold text-on-surface dark:text-inverse-on-surface text-lg">Ударение</span>
+</div>
+<div class="flex flex-wrap gap-2 text-[10px] text-text-muted" id="active-levels-stress"><span class="px-2 py-0.5 rounded-full bg-surface-variant text-text-muted border border-subtle">Буква</span><span class="px-2 py-0.5 rounded-full bg-surface-variant text-text-muted border border-subtle">Слово</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Controls & Keyboard Wrapper -->
+<div class="fixed bottom-0 w-full z-50 flex flex-col items-center" id="bottom-controls-wrapper">
+<div class="flex flex-col items-center w-full bg-surface/95 dark:bg-text-main/95 backdrop-blur-sm px-1 py-4 border-t border-subtle dark:border-outline" id="orthography-keyboard-container" style="display: flex;">
+<div class="w-full max-w-[750px] flex flex-col items-center mx-auto" id="orthography-keyboard" style="display: flex; gap: 8px;"><div class="keyboard-row"><button class="keyboard-key">й</button><button class="keyboard-key">ц</button><button class="keyboard-key">у</button><button class="keyboard-key">к</button><button class="keyboard-key">е</button><button class="keyboard-key">н</button><button class="keyboard-key">г</button><button class="keyboard-key">ш</button><button class="keyboard-key">щ</button><button class="keyboard-key">з</button><button class="keyboard-key">х</button><button class="keyboard-key">ъ</button></div><div class="keyboard-row"><button class="keyboard-key">ф</button><button class="keyboard-key">ы</button><button class="keyboard-key">в</button><button class="keyboard-key">а</button><button class="keyboard-key">п</button><button class="keyboard-key">р</button><button class="keyboard-key">о</button><button class="keyboard-key">л</button><button class="keyboard-key">д</button><button class="keyboard-key">ж</button><button class="keyboard-key">э</button><button class="keyboard-key">ё</button></div><div class="keyboard-row"><button class="keyboard-key">-</button><button class="keyboard-key">я</button><button class="keyboard-key">ч</button><button class="keyboard-key">с</button><button class="keyboard-key">м</button><button class="keyboard-key">и</button><button class="keyboard-key">т</button><button class="keyboard-key">ь</button><button class="keyboard-key">б</button><button class="keyboard-key">ю</button><button class="keyboard-key"><span class="material-symbols-outlined">backspace</span></button></div><div class="keyboard-row"><button class="keyboard-key-wide">пробел</button></div></div>
+</div>
+<footer class="w-full border-t border-subtle dark:border-outline bg-surface dark:bg-text-main pb-safe" id="bottom-stats-bar">
+<div class="max-w-[750px] mx-auto flex justify-between items-center h-16 px-4 w-full">
+<div class="flex gap-4 items-center flex-1">
+<div class="flex flex-col items-center min-w-[50px]">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider text-[8px]">Решено</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-solved">0</span>
+</div>
+<div class="flex flex-col items-center min-w-[50px]">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider text-[8px]">Успех</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-success">0%</span>
+</div>
+</div>
+<div class="flex items-center justify-center flex-1">
+<div class="" id="session-controls">
+<button class="p-2 bg-error/10 text-error rounded-full font-ui-label text-[10px] border border-error/20 hover:bg-error hover:text-white transition-all flex items-center gap-1 shadow-sm whitespace-nowrap" id="end-session-button" onclick="endSession()">
+<span class="material-symbols-outlined text-[14px]">stop_circle</span> Завершить
+                    </button>
+</div>
+</div>
+<div class="flex gap-4 items-center justify-end flex-1">
+<div class="flex flex-col items-center min-w-[50px]" id="streak-container">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider text-[8px]">Серия</span>
+<div class="flex items-center gap-0.5">
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-streak">0</span>
+<span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style='font-variation-settings: "FILL" 1;'>local_fire_department</span>
+</div>
+</div>
+<div class="flex flex-col items-center min-w-[50px]">
+<span class="font-stats-label text-stats-label text-text-muted dark:text-surface-variant uppercase tracking-wider text-[8px]">Время</span>
+<span class="font-stats-value text-stats-value text-primary dark:text-primary-fixed text-xs" id="stat-time">05:08</span>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+</body></html>
