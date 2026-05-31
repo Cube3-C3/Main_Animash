@@ -8,6 +8,7 @@
             sessionStart: null,
             solvedCount: 0,
             attemptsCount: 0,
+            successCount: 0,
             streakCount: 0,
             seconds: 0,
             timerInterval: null,
@@ -17,6 +18,12 @@
 			inputBatchTimeout: null,         // Идентификатор 60ms окна тишины
 			isMultiKeyPressDetected: false,  // Флаг фиксации нарушения (двойного клика)
 			currentSlotRecorded: false,
+			currentIndexSession: {
+				taskId: null,
+				index: null,
+				firstTry: true,
+				startedAt: 0
+			},
 			taskStartTime: 0,
 			lastSuccessTime: 0
         };
@@ -57,17 +64,18 @@
 		load() { return JSON.parse(localStorage.getItem(this.key) || '{}'); }
 		save(data) { localStorage.setItem(this.key, JSON.stringify(data)); }
 		
-		update(taskId, index, isSuccess, timeSpent) {
+		completeIndex({ taskId, index, firstTry, timeSpent }) {
 			const data = this.load();
 			const statKey = `${taskId}:${index}`;
 			if (!data[statKey]) data[statKey] = { attempts: 0, success: 0, totalTime: 0, streak: 0, lastSeen: 0 };
 			
-			data[statKey].attempts++;
+			data[statKey].attempts += 1;
 			data[statKey].totalTime += timeSpent;
 			data[statKey].lastSeen = Date.now();
 			
-			if (isSuccess) {
-				data[statKey].success++; data[statKey].streak++;
+			if (firstTry) {
+				data[statKey].success += 1;
+				data[statKey].streak += 1;
 			} else {
 				data[statKey].streak = 0;
 			}
@@ -99,6 +107,7 @@
                 appState.sessionActive = true;
                 appState.solvedCount = 0;
                 appState.attemptsCount = 0;
+                appState.successCount = 0;
                 appState.streakCount = 0;
                 appState.seconds = 0;
                 appState.sessionStart = Date.now();
@@ -119,9 +128,59 @@
                 appState.sessionActive = false;
                 clearInterval(appState.timerInterval);
                 appState.currentTask = null;
+                appState.currentIndexSession = this.createIndexSession(null, null);
                 UI.toggleSessionView(false);
                 UI.clearTask();
             },
+
+			createIndexSession(taskId, index) {
+				return {
+					taskId,
+					index,
+					firstTry: true,
+					startedAt: taskId === null || index === null ? 0 : performance.now()
+				};
+			},
+
+			startIndexSession() {
+				const task = appState.currentTask;
+				appState.currentIndexSession = this.createIndexSession(task?.id ?? null, appState.activeIndex ?? null);
+			},
+
+			markIndexError(targetIdx) {
+				const session = appState.currentIndexSession;
+				if (!session || session.taskId !== appState.currentTask?.id || session.index !== targetIdx) {
+					return;
+				}
+				session.firstTry = false;
+			},
+
+			completeCurrentIndex(targetIdx) {
+				const session = appState.currentIndexSession;
+				if (!session || session.taskId !== appState.currentTask?.id || session.index !== targetIdx) {
+					return;
+				}
+
+				const timeSpent = (performance.now() - session.startedAt) / 1000;
+				statsManager.completeIndex({
+					taskId: session.taskId,
+					index: session.index,
+					firstTry: session.firstTry,
+					timeSpent
+				});
+
+				appState.attemptsCount += 1;
+				appState.solvedCount += 1;
+				if (session.firstTry) {
+					appState.successCount += 1;
+					appState.streakCount += 1;
+				} else {
+					appState.streakCount = 0;
+				}
+
+				appState.currentIndexSession = this.createIndexSession(null, null);
+				UI.renderStats();
+			},
 
             // Внутри const Session = { ... } замените методы nextTask и nextIndex:
 
@@ -150,15 +209,12 @@
 			}
 
 			// --- НОВАЯ ЛОГИКА: Вероятностный выбор из Топ-5 индексов ---
-			// Берем до 5 самых сложных индексов в этом задании
-			let topWeakestIndices = active.slice(0, 5);
-
-			// Перемешиваем этот топ-5 (чтобы разорвать цикл механического заучивания)
-			// Используем алгоритм случайной сортировки
-			topWeakestIndices = topWeakestIndices.sort(() => Math.random() - 0.5);
-
-			// Ограничение: максимум 3 слота на задачу
-			active = topWeakestIndices.slice(0, 3); // 
+			// Берем до 5 самых сложных индексов, перемешиваем этот топ-5
+			// и оставляем максимум 3 слота на задачу.
+			active = active
+				.slice(0, 5)
+				.sort(() => Math.random() - 0.5)
+				.slice(0, 3);
 
 			// Сортируем отобранные индексы обратно по возрастанию, чтобы визуально решать их слева направо
 			active.sort((a, b) => a.index - b.index);
@@ -183,6 +239,7 @@
 		appState.indexPointer = 0;
 		appState.activeIndex = appState.currentTask.activeIndexes[0];
 		appState.currentSlotRecorded = false; // Сбрасываем при новом задании
+		this.startIndexSession();
 		
 		UI.renderTask();
 	},
@@ -195,6 +252,7 @@
 			
 			const prevActiveIndex = appState.activeIndex;
 			appState.activeIndex = t.activeIndexes[appState.indexPointer];
+			this.startIndexSession();
 			
 			UI.shiftActiveSlot(prevActiveIndex, appState.activeIndex);
 		} else {
@@ -208,20 +266,6 @@
 		}
 	},
 
-            registerAttempt(isCorrect, targetIdx, timeSpent) {
-                appState.attemptsCount++;
-                statsManager.update(appState.currentTask.id, targetIdx, isCorrect, timeSpent);
-
-                // ПРАВКА: Считаем абсолютно все пройденные индексы (и правильные, и ошибочные)
-                appState.solvedCount++; 
-
-                if (isCorrect) {
-                    appState.streakCount++;
-                } else {
-                    appState.streakCount = 0;
-                }
-                UI.renderStats();
-            }
         };
 	const PUNCTUATION_WEIGHTS = {
 				',': 'light',
@@ -407,7 +451,7 @@
             renderStats() {
                 dom.statSolved.textContent = appState.solvedCount;
                 dom.statStreak.textContent = appState.streakCount;
-                dom.statSuccess.textContent = appState.attemptsCount ? Math.round((appState.solvedCount / appState.attemptsCount) * 100) + '%' : '0%';
+                dom.statSuccess.textContent = appState.attemptsCount ? Math.round((appState.successCount / appState.attemptsCount) * 100) + '%' : '0%';
             },
 
             renderTime(seconds) {
@@ -525,6 +569,10 @@
 			isCorrect = (inputValue.toLowerCase() === expected.toLowerCase());
 		}
 
+		if (!isCorrect) {
+			Session.markIndexError(targetIdx);
+		}
+
 		// --- УМНЫЙ АНТИСПАМ ---
 		if (appState.inputBatchTimeout) {
 			if (isCorrect) {
@@ -543,14 +591,9 @@
 
 		appState.inputBatchTimeout = setTimeout(() => {
 			appState.inputBatchTimeout = null;
-			const timeSpent = (performance.now() - appState.taskStartTime) / 1000;
-
 			// Если зафиксирован спам неверными клавишами
 			if (appState.isMultiKeyPressDetected) {
-				if (!appState.currentSlotRecorded) {
-					Session.registerAttempt(false, targetIdx, timeSpent);
-					appState.currentSlotRecorded = true;
-				}
+				Session.markIndexError(targetIdx);
 				UI.renderFeedback(false);
 				UI.animateError(t.type === 'stress' ? inputValue : targetIdx, '❌', () => {
 					dom.hiddenInput.value = '';
@@ -558,10 +601,10 @@
 				return;
 			}
 
-			// --- БИНАРНАЯ ЛОГИКА СТАТИСТИКИ ---
-			if (!appState.currentSlotRecorded) {
-				Session.registerAttempt(isCorrect, targetIdx, timeSpent);
-				appState.currentSlotRecorded = true; // Жестко блокируем статистику до смены слота
+			if (isCorrect) {
+				Session.completeCurrentIndex(targetIdx);
+			} else {
+				Session.markIndexError(targetIdx);
 			}
 			
 			UI.renderFeedback(isCorrect);
