@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fis Preview</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Fis Preview</h1>
+    <span class="badge" id="pkgBadge">no package</span>
+    <div class="toolbar">
+      <label class="file-label btn">
+        📂 JSON
+        <input type="file" id="fileInput" multiple accept=".json,application/json" />
+      </label>
+      <div class="lang-toggle">
+        <button type="button" data-lang="ru" class="active">RU</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="workspace">
+    <div class="empty-hint" id="emptyHint">
+      Загрузите JSON-файлы пакета (📂).<br />
+      <small style="opacity:.7">Оболочка построится из filter_ontology + presentation_ontology пакета.</small>
+    </div>
+  </div>
+
+  <div class="status-bar" id="status">Готов · загрузите JSON (📂)</div>
+
+  <!-- Package (replaceable) -->
+  <script src="../Fis_data/code.js"></script>
+
+  <!-- Platform modules -->
+  <script src="style-registry.js"></script>
+  <script src="signals.js"></script>
+  <script src="render.js"></script>
+  <script src="platform.js"></script>
+</body>
+</html>
